@@ -1,0 +1,633 @@
+﻿ā
+	101
+	ē
+	113
+	ī
+	12b
+	ō
+	14d
+	ū
+	16b
+	
+
+CAPVT 1
+mē, pron. me, myself
+quid, pron., what
+nihil, noun, nothing
+nōn, adv., not
+saepe, adv., often
+sī, conj., if
+amō, amāre, amāvī, amātum, to love, like; amābō tē, idiom, please (lit., I will love you)
+cōgitō, cōgitāre, cōgitāvī, cōgitātum, to think, ponder, consider, plan
+dēbeō, dēbēre, dēbuī, dēbitum, to owe; ought, must, should
+dō, dare, dedī, datum, to give, offer; unlike other first conj. verbs, the stem vowel is only long in the 2nd pers. Sg. indic. and sg. imperat.
+errō, errāre, errāvī, errātum, to wander; err, go astray, make a mistake, be mistaken
+laudō, laudāre, laudāvī, laudātum, to praise
+moneō, monēre, monuī, monitum, to remind, advise, warn
+salveō, salvēre, salvē, salvēte, to be well, be in good health; salvē, salvēte, hello, greetings!
+servō, servāre, servāvī, servātum, to preserve, save, keep, guard
+cōnservō, cōnservāre, cōnservāvī, cōnservātum, a stronger form of servō, to preserve, conserve, maintain
+terreō, terrēre, terruī, territum, to frighten, terrify
+valeō, valēre, valuī, valitūrum, to be strong, have power; be well; valē (valēte), goodbye, farewell!
+videō, vidēre, vīdī, vīsum, to see; observe, understand
+vocō, vocāre, vocāvī, vocātum, to call, summon
+
+
+CAPVT 2
+fāma, fāmae, f., rumor, report; fame, reputation
+fōrma, fōrmae, f., form, shape; beauty
+fortūna, fortūnae, f., fortune, luck
+īra, īrae, f., ire, anger
+nauta, nautae, m., sailor
+patria, patriae, f., fatherland, native land, (one's) country
+pecūnia, pecūniae, f., money
+philosophia, philosophiae, f., philosophy
+poena, poenae, f., penalty, punishment; poenās dare, idiom, to pay the penalty
+poēta, poētae, m., poet
+porta, portae, f., gate, entrance
+puella, puellae, f., girl
+rosa, rosae, f., rose
+sententia, sententiae, f., feeling, thought, opinion, vote, sentence
+vīta, vītae, f., life; mode of life
+antīquus, antīqua, antīquum, adj., ancient, old-time
+māgnus, māgna, māgnum, adj. large, great, important
+meus, mea, meum, adj. my
+multus, multa, multum, adj., much, many
+tuus, tua, tuum, adj., your
+et, conj., and; even; et … et, both … and
+sed, conj., but
+Ō, interj., O!, Oh!
+sine, prep. + abl., without
+
+
+CAPVT 3
+ager, agrī, m., field, farm
+agricola, agricolae, m., farmer
+amīcus, amīcī, m., and amīca, amīcae, f., friend
+fēmina, fēminae, f., woman
+fīlia, fīliae, f., dat. and abl. pl. fĭliabus, daughter
+fĭlius, fĭliī, m., son
+numerus, numerī, m., number
+populus, populī, m., the people, a people, a nation
+puer, puerī, m., boy; pl. boys, children
+sapientia, sapientiae, f. wisdom
+vir, viri, m., man, hero
+avārus, avāra, avārum, greedy, avaricious
+paucī, paucae, pauca, usually pl., few, a few
+Rōmānus, Rōmāna, Rōmānum, Roman
+dē, prep + abl., down from, from; concerning, about; as a prefix dē- with such meanings as down, away, aside, out, off
+in, prep + abl., in, on; also as a prefix
+hodiē, adv., today
+semper, adv., always
+habeō, habēre, habuī, habitum, to have, hold, possess; consider, regard
+satiō, satiāre, satiāvī, satiātum, to satisfy, sate
+
+
+CAPVT 4
+bāsium, bāsiē, n., kiss
+bellum, bellī, n., war
+cōnsilium, cōnsiliī, n., plan, purpose, counsel, advice, judgment, wisdom
+cūra, cūrae, f., care, attention, caution, anxiety
+dōnum, dōnī, n., gift, present
+exitum, exitī, n., destruction, ruin
+magister, maisterī, m., and magistra, magistrae, f., schoolmaster or schoolmistress, teacher, master, or mistress
+mora, morae, f., delay
+nihil, indeclinable, nothing
+oculus, oculī, m., eye
+officium, officiī, n., duty, service
+otium, otiī, n., leisure, peace
+perīculum, perīculī, n., danger, risk
+remedium, remediī, n., cure, remedy
+bellus, bella, bellum, pretty, handsome, charming
+bonus, bona, bonum, good, kind
+hūmānus, hūmāna, hūmānum, pertaining to man, human, humane, kind; refined, cultivated
+malus, mala, malum, bad, wicked, evil
+parvus, parva, parvum, small, little
+stultus, stulta, stultum, foolish; stultus, stultī, m., a fool
+vērus, vēra, vērum, true, real, proper
+iuvō (or adiuvō), iuvāre, iuvī, iūtum, to help, aid, assist; please
+sum, esse, fuī, futurum, to be, exist
+
+
+CAPVT 5
+adulēscentia, adulēscentiae, f.,youth, young manhood; youthfulness
+animus, animī, m., soul, spirit, mind; animī, animōrum, high spirits, pride, courage
+caelum, caelī, n., sky, heaven
+culpa, culpae, f., fault, blame
+glōria, glōriae, f., glory, fame
+verbum, verbī, n., word
+tē, abl. and acc. sg., you; yourself
+līber, lībera, līberum, free
+noster, nostra, nostrum, our, ours
+pulcher, pulchra, pulchrum, beautiful, handsome; fine
+sānus, sāna, sānum, sound, healthy, sane
+igitur, cong., postpositive, therefore, consequently
+-ne, interrog. suffix attached to the first word of a sentence, typically the verb or another word on which the question hinges, to introduce a question whose answer is uncertain.
+propter, prep. + acc., on account of, because of
+crās, adv., tomorrow
+heri, adv., yesterday
+quandō, interrog. and rel. adv. and conj., when; sī quandō, if ever
+satis, indcl. noun, adj. and adv., enough, sufficient (-ly)
+tum, adv., then at that time; thereupon, in the next place
+cēnō, cēnāre, cēnāvī, cēnātum, to dine
+maneō, manēre, mānsī, mānsum or remaneō, remanēre, remānsī, remānsum, to remain, stay, stay behind, abide, continue
+superō, superāre, superāvī, superātum, to be above, have the upper hand, surpass; over come, conquer
+CAPVT 6
+deus, ī, m., voc. sg. deus, nom. pl. dī, dat. and abl pl. dīs (the plurals deī and deīs became common during the Augustan Period), god, and dea, deae, f., dat. and abl pl. deābus, goddess
+discipulus, discipulī, m., and discipula, discipulae, f., learner, pupil, student
+īnsidiae, īsidiārum, f. pl., ambush, plot, treachery
+liber, librī, m., book
+tyrannus, tyrannī, m., absolute ruler, tyrant
+vitium, vitiī, n., fault, crime, vice
+Graecus, Graeca, Graecum, Greek; Graecus, Graecī, m., a Greek
+perpetuus, perpetua, perpetuum, perpetual, lasting
+plēnus, plēna, plēnum, full, abundant, generous
+salvus, salva, salvum, safe, sound
+secundus, secunda, secundum, second; favorable
+vester, vestra, vestrum, your (pl., i.e., used in addressing more than one person), yours
+-que, enclitic, conj., and; appended to the second of two words to be joined
+ubi: (1) rel. adv. and conj., where, when; (2) interrog. Adv. and conj., where?
+ibi, adv., there
+nunc, adv., now, at present
+quārē, adv., lit. because of which thing (quā rē), but more commonly therefore, wherefore, why
+possum, posse, potuī, to be able, can, could, have power
+tolerō, tolerāre, tolerāvī, tolerātum, to bear, endure
+
+
+CAPVT 7
+amor, amōris, m., love
+carmen, carminis, n., song, poem
+cīvitās, cīvitātis, f., state, citizenship
+corpus, corporis, n., body
+homō, hominis, m., human being, man
+labor, labōris, m., labor, work, toil; a work, production
+littera, litterae, f., a letter of the alphabet; litterae, litterārum, pl., a letter, literature
+mōs, mōris, m., habit, custom, manner; mōrēs, mōrum, pl., habits, morals, character
+nōmen, nōminis, n., name
+pāx, pācis, f., peace
+rēgīna, rēgīnae, f.,queen
+rēx, rēgis, m., king
+tempus, temporis, n., time; occasion, opportunity
+terra, terrae, f., earth, ground, land, country
+uxor, uxōris, f., wife
+virgō, virginis, f., maiden, virgin
+virtūs, virtūtis, f., manliness, courage; excellence, character, worth, virtue
+novus, nova, novum, new; strange
+post, prep. + acc., after, behind
+sub, prep. + abl., with verbs of rest, + acc. with verbs of motion, under, up under, close to; down to/into, to/into, to/at the foot of
+audeō, audēre, ausus sum, to dare
+necō, necāre, necāvī, necātum, to murder, kill
+
+
+CAPVT 8
+Cicerō, Cicerōnis, m., (Marcus Tullius) Cicero
+cōpia, cōpiae, f., abundance, supply; cōpiae, cōpiārum, pl., supplies, troops, forces
+frāter, frātris, m., brother
+laus, laudis, f., praise, glory, fame
+lībertās, lībertātis, f., liberty
+ratiō, ratiōnis, f., reckoning, account; reason, judgment, consideration; system; manner, method
+scrīptor, scrīptoris, m., writer, author
+soror, sorōris, m., sister
+victōria, victōriae, f., victory
+dum, conj., while, as long as, at the same time that; + subjunct., until
+ad, prep. + acc., to, up to, near to, in the sense of “place to which” with verbs of motion. In compounds the d is sometimes assimilated to the following consonant
+ex or ē, prep. + abl., out of, from within; by reason of, on account of; following cardinal numbers, of. The Romans used ex before consonants or vowels; ē before consonants only. Often used as a prefix in compounds, sometimes with the x assimilated to the following consonant
+numquam, adv., never
+tamen, adv., nevertheless, still
+agō, agere, ēgī, āctum, to drive, lead, do act; pass, spend; grātiās agere + dat. For the person being thanked, to thank (someone), lit., to give thanks to
+dēmōnstrō, dēmōnstrāre, dēmōnstrāvī, dēmōnstrātum, to point out show, demonstrate
+discō, discēre, didicī, to learn
+dūcō, dūcere, dūxī, ductum, imp. sg. duc, to lead; consider, regard; prolong
+gerō, gerere, gessī, gestum, to carry; carry on, manage, conduct, wage, accomplish, perform
+scrībō, scrībere, scrīpsī, scrīptum, to write, compose
+trahō, trahere, trāxī, tractum, to draw, drag; derive, acquire
+vincō, vincere, vīcī, victum, to conquer, overcome
+
+
+CAPVT 9
+locus, locī, m., place; passage in literature; pl., loca, locōrum, n., places, region; locī, locōrum, m., passages in literature
+morbus, morbī, m., disease, sickness
+studium, studiī, n., eagerness, zeal, pursuit, study
+hic, haec, hoc, this; the latter; at times weakened to he, she, it, they
+ille, illa, illud, that; the former; the famous; he, she, it, they
+iste, ista, istude, that of yours, that; such; sometimes with contemptuous force
+alius, alia, aliud, -īus adj., other, another; aliī … aliī, some … others
+alter, altera, alterum, -īus adj., the other (of two), second
+neuter, neutra, neutrum, -īus adj., not either, neither
+nūllus, nūlla, nūllum, -īus adj., not any, no, none
+sōlus, sōla, sōlum, -īus adj., alone, only, the only; nōn sōlum … sed etiam, not only … but also
+tōtus, tōta, tōtum, -īus adj., whole, entire
+ūllus, ūlla, ūllum, -īus adj., any
+ūnus, ūna, ūnum, -īus adj., one, single, alone
+uter, utra, utrum, -īus adj., either, which (of two)
+enim, postpositive conj., for, in fact, truly
+in, prep. + acc., into, toward; against; in compounds in- may also appear as il-, ir-, im; and it may have its literal meanings or have simply an intensive force
+nimis or nimium, adv., too, too much, excessively; in a positive sense, esp. With adjectives and adverbs, exceedingly, very
+
+
+CAPVT 10
+amīcitia, amīcitiae, f., friendship
+cupiditās, cupiditātis, f., desire, linging, passion; cupidity, avarice
+hōra, hōrae, f., hour, time
+nātūra, nātūrae, f., nature
+senectūs, senectūtis, f., old age
+timor, timōris, m., fear
+vēritās, vēritātis, f., truth
+via, viae, f., way, road, street
+voluptās, voluptātis, f., pleasure
+beātus, veāta, beātum, happy, fortunate, blessed
+quoniam, conj., since inasmuch as
+cum, prep. + abl., with. As a prefix, cum may appear as com-, con-, cor-, col-, c-, and means with, together, completely, or simply has an intensive force
+audiō, audīre, audīvī, audītum, to hear, listen to
+capiō, capere, cēpī, captum, to take, capture, size, get. In compounds, the -a- becomes -i-, -cipiō
+dīco, dīcere, dīxī, dictum, imp. sg. dīc, to say, tell, speak; name, call
+faciō, facere, fēcī factum, imp. sg. fac, to make, do, accomplish. In compounds, the -a- becomes -i-, -ficiō
+fugiō, fugere, fūgi, fugitūrum, to flee, hurry away; escape; go into exile; avoid, shun
+veniō, venīre, vēnī, ventum, to come
+inveniō, invenīre, invēnī, inventum, to come upon, find
+vīvō, vīvere, vīxī, vīctum, to live
+
+
+CAPVT 11
+caput, capitis, n., head; leader; beginning; life; heading; chapter
+cōnsul, cōnsulis, m., consul
+nēmō, nūllīus, nēminī, nēminem, nūllō or nūllā, m. or f., no one, nobody
+ego, meī, I
+tū, tuī, you
+is, ea, id, this, that; he, she, it (i.e. = id est, that is)
+ūdem, eadem, idem, the same (id. = idem)
+amīcus, amīca, amīcum, friendly
+cārus, cāra, cārum, dear
+quod, conj., because
+neque, nex, conj., and not, nor; neque … neque or nec … nec, neither … nor
+autem, postpositive conj., however; moreover
+bene, adv. of bonus, well, satisfactorily, quite
+etiam, adv., even, also
+intellegō, intellegere, intellēxī, intellēctum, to understand
+mittō, mittere, mīsī, missum, to send, let go
+sentiō, sentīre, sēnsī, sēnsum, to feel, perceive, think, experience
+
+
+CAPVT 12
+adulēscēns, adulēscentis, m. and f., young man or woman
+annus, annī, m., year
+Asia, Asiae, f, Asia, commonly referring to Asia Minor
+Caesar, Caesaris, m., Caesar
+māter, mātris, f., mother
+medicus, medicī, m., and medica, medicae, f., doctor, physician
+pater, patris, m., father
+patientia, patientiae, f., suffering; patience, endurance
+prīncipium, prīncipiī, n., beginning
+acerbus, acerba, acerbum, harsh, bitter, grievous
+prō, prep. + abl., in front of, before, on behalf of, for the sake of, in return for, instead of, for, as; also as a prefix
+diū, adv., long, for a long time
+nūper, adv., recently
+āmittō, āmittere, āmīsī, āmissum, to send away; lose, let go
+cadō, cadere, cecidī, cāsūrum, to fall
+creō, creāre, creāvī, creātum, to create
+
+
+CAPVT 13
+dīvitae, dīvitiārum, f., pl., riches, wealth
+factum, factī, n., deed, act, achievement
+signum, signī, n., sign, signal, indication; seal
+ipse, ipsa, ipsum, intensive pron., myself, yourself, himself, herself, itself, etc., the very, the actual
+quisque, quidque (gen. cuiusque; dat. cuique), indefinite pron., each one, each person, each thing
+suī, reflective pron. of 3rd pers., himself, herself, itself, themselves
+doctus, docta, doctum, taught, learned, skilled
+fortūnātus, fortūnāta, fortūnātum, lucky, fortunate, happy
+suus, sua, suum, reflexive possessive adj. of 3rd pers., his own, her own, its own, their own
+nam, conj., for
+ante, prep. + acc., before, in front of; adv., before, previously
+per, prep. + acc., through; with reflexive pron., by; per- (assimilated to pel- before forms beginning with l-), as a prefix, through, through and through = thoroughly, completely, very
+ōlim, adv., once (upon a time), long ago, formerly; some day, in the future
+alō, alere, aluī, altum, to nourish, support, sustain, increase; cherish
+dīligō, dīligere, dīlēxī, dīlēctum, to esteem, love
+iungō, iungere, iūnxī, iūnctum, to join
+stō, stāre, stetī, statum, to stand, stand still, or firm
+
+
+CAPVT[a] 14
+animal, animālis, n., a living creature, animal
+aqua, aquae, f., water
+ars, artis, f., art, skill
+auris, auris, f., ear
+cīvis, cīvis, m. and f., citizen
+iūs, iūris, n., right, justice, law
+mare, maris, n., sea
+mors, mortis, f., death
+nūbēs, nūbis, f., cloud
+ōs, ōris, n., mouth, face
+pars, partis, f., part, share; direction
+Rōma, Rōmae, f., Rome
+turba, turbae, f., uproar, disturbance; mob, crowd, multitude
+urbs, urbis, f., city
+vīs, vīs, f., force, power, violence; vīrēs, vīrium, pl., strength
+ā (before consonants, like Eng. “a,” vs “an”), ab (before vowels or consonants), prep. + abl., away from, from; by (personal agent); frequent in compounds
+trāns, prep. + acc., across; also a prefix
+appellō, appellāre, appellāvī, appellātum, to speak to, address (as), call, name
+currō, currere, cucurrī, cursum, to run, rush, move quickly
+mūtō, mŭtāre, mŭtāvī, mūtātum, to change, alter; exchange
+teneō, tenēre, tenuī, tentum, to hold, keep, possess; restrain; -tineō, -ēre, -tinuī, -tentum in compounds, e.g., contineō
+vītō, vītāre, vītāvī, vītātum, to avoid, shun
+
+
+CAPVT 15
+Italia, Italiae, f., Italy
+memoria, memoriae, f., memory, recollection
+tempestās, tempestātis, f., period of time, season; weather, storm
+centum, indecl. adj., a hundred
+mīlle, indecl. adj., in sg., thousand; mīlia, mīlium, n., i-stem noun in pl., thousands
+miser, misera, miserum, wretched, miserable, unfortunate
+inter, prep. + acc., between, among
+itaque, adv., and so, therefore
+committō, committere, commīsī, commissum, to entrust, commit
+exspectō, exspectāre, exspectāvī, exspectātum, to look for, expect, await
+iaciō, iacere, iēcī, iactum, to throw, hurl. Appears in compounds such as -iciō, -icere, -iēcī, -iectum: eg. ēiciō, ēicere, ēiēcī, ēiectum, to throw out, drive out
+timeō, timēre, timuī, to fear, be afraid (of)
+
+
+Numerals
+
+
+	Cardinals
+	Ordinals
+	Roman Numerals
+	1
+	ūnus, -a, -um
+	prīmus, -a, -um
+	I
+	2
+	duo, duae, duo
+	secundus, alter
+	II
+	3
+	trēs, tria
+	tertius
+	III
+	4
+	quattuor
+	quārtus
+	IIII; IV
+	5
+	quīnque
+	quīntus
+	V
+	6
+	sex
+	sextus
+	VI
+	7
+	septem
+	septimus
+	VII
+	8
+	octō
+	octāvus
+	VIII
+	9
+	novem
+	nōnus
+	VIIII; IX
+	10
+	decem
+	decimus
+	X
+	11
+	ūndecim
+	ŭndecimus
+	XI
+	12
+	duodecim
+	duodecimus
+	XII
+	13
+	tredecim
+	tertius decimus
+	XIII
+	14
+	quattuordecim
+	quārtus decimus
+	XIIII; XIV
+	15
+	quīndecim
+	quīntus decimus
+	XV
+	16
+	sēdecim
+	sextus decimus
+	XVI
+	17
+	septendecim
+	septimus decimus
+	XVII
+	18
+	duodēvīgintī
+	duodēvīcēsimus
+	XVIII
+	19
+	ūndēvīgintī
+	ūndēvīcēsimus
+	XVIIII; XIX
+	20
+	vīgintī
+	vīcēsimus
+	XX
+	21
+	vīgintī ūnus, ūnus et vīgintī
+	vīcēsimus prīmus
+	XXI
+	30
+	trīgintā
+	trīcēsimus
+	XXX
+	40
+	quadrāgintā
+	quadrāgēsimus
+	XXXX, XL
+	50
+	quīnquāgintā
+	quīnquāgēsimus
+	L
+	60
+	sexāgintā
+	sexāgēsimus
+	LX
+	70
+	
+
+	
+
+	
+
+	80
+	
+
+	
+
+	
+
+	90
+	
+
+	
+
+	
+
+	100
+	centum
+	centēsimus
+	C
+	101
+	centum ūnus
+	centēsimus prīmus
+	CI
+	200
+	ducentī, -ae, -a
+	duocentēsimus
+	CC
+	300
+	
+
+	
+
+	
+
+	400
+	
+
+	
+
+	
+
+	500
+	
+
+	
+
+	
+
+	600
+	
+
+	
+
+	
+
+	700
+	
+
+	
+
+	
+
+	800
+	
+
+	
+
+	
+
+	900
+	
+
+	
+
+	
+
+	1000
+	mīlle
+	mīllēsimus
+	M
+	2000
+	duo mīlia
+	bis mīllēsimus
+	MM
+	
+
+Other
+Rōma, -ae, f., Rome
+studium, -iī, n., eagerness, zeal, pursuit, study
+ad, prep. + acc., place toward; purpose (for)
+hīc, adv., here
+falsus, falsa, falsum, false, deceptive
+nox, noctis, f., i-stem, night
+Vestal Virgins:
+pudicus, -a, um, modest
+dēdicō, dedicate
+fidēlis, -ei, f., faith
+sex, six
+lex, lēgis, f., law
+Aeneid:
+Vergilius, Vergilii, m., Vergil
+Aeneas, Aeneae, m., Aeneas
+dextra, dextrae, f., right hand
+lux, lucis, f., light
+sanguis, sanguinis, m., blood
+Kings of Rome:
+lupa, lupae, f., she-wolf, prostitute
+interrex, interregis, m., one who holds office between the death of a king and their successor
+pontifex, pontificis, m., high priest / pontiff
+decerno, decernere, to decide, vote for
+fugio, fugere, to flee, fly, run away, go into exile
+Spartacus:
+auxilium, -iī, n., aid, help
+lūdus, -ī, m., game, sport; school
+legiō, -ōnis, f., legion
+cursus, -ūs, m., running, race; course
+honor, -nōris, m., honor, esteem; public office
+Gladiators and Sports:
+recreō, to cheer
+lūdus, -ī, m., game
+dolor, -lōris, m., pain
+servus, -ī, m., slave
+ferrum, ī, n.; gladius, -ī, m., sword
+Clothing During Ancient Rome
+strophium, strophi, n., bra, head-band, twisted breast-band
+alicula, aliculae, n., light coat/cloak/hunting dress
+stola, stolae, f., clothing, dress
+praetexta, praetextae, f., toga bordered with purple worn by children over 16 and magistrates
+sutor, sutoris, m., cobbler, shoemaker
+calceus, calcei, m., shoe, soft shoe, slipper
+Mystery Cults
+caeremonia, caeremoniae, f., ceremony; holy worship; sacred rite; sanctity
+ludus, ludi, m., sports, games; school
+mater, matris, f., mother
+secretum, secreti, n., withdrawal, loneliness; private matter, secret
+tauros, tauri, m., bull
+Mark Antony and Octavian
+Augustus, -i, m., Augustus, first Roman Emperor
+Caesar, -saris, m., Caesar, especially referring to Gaius Iulius Caesar
+cupido, -dinis, f., desire, passion
+externaus, -a, -um, foreign
+pater, -tris, m., father
+Roman Food
+iēntāculum, -ī, n., breakfast (particularly right after waking up)
+cēna, -ae, f., dinner
+vesperna, -ae, f., dinner
+prandium, -iī/-ī, n., late breakfast, lunch (eaten about midday)
+comissatiō, -tiōnis, f., feasting, carousing, merrymaking
+Roman Water
+aqua, -ae, f., water
+castellum, -i, n., castle/reservoir
+balneum, n., bath, bathhouse
+tepdiarium, n., tepid/warm room/bath
+frigidarium, n., cold room/bath
+Voting and Elections
+Campus Martius, the field of Mars where most elections were conducted
+rēs pūblica, reī pūblicae, f., The Republic or State
+Comita Centuriata, the assembly of the Century, which voted for more important military offices like Consuls
+Comita Tributa, the tribal assembly which was the nonmilitary assembly
+saeptus (or ovile), m., saepta, f., and saeptum, n., participle, enclosed fenced, or surrounded; also the word for the voting space
+plēbs, plēbis, f., common people/plebian
+patricius, patriciī, m., noble/patrician
+rūsticus, rūs, country or tribes located outside of Rome
+Women Poets
+congregō, congregāre, congregāvī, congregātum, to gather together, to assemble
+varius, -iī, an epic poet
+statua, -ae, f., statue
+versus, -ūs, m., line, verse
+contundō, contundere, contundī, contūsum, to beat, crush, bruise, destroy
+
+
+[a]Watch out for i-stem nouns

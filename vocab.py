@@ -9,6 +9,21 @@ class Gender(Enum):
     Neut = 3
 
 
+class VocabType(Enum):
+    """
+    Values are not to be changed
+    """
+
+    Verb = 0
+    Adverb = 1
+    Noun = 2
+    Adjective = 3
+    Pronoun = 4
+    Preposition = 5
+    Conjunction = 6
+    Interjection = 7
+
+
 class Vocab:
     def __init__(self):
         pass

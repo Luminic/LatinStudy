@@ -1,6 +1,40 @@
 from __future__ import annotations
 
 from html.parser import HTMLParser
+from typing import TypeAlias
+
+import vocab
+
+
+class PCol:
+    CNONE = ''
+
+    CEND      = '\33[0m'
+    CBOLD     = '\33[1m'
+    CITALIC   = '\33[3m'
+    CURL      = '\33[4m'
+    CBLINK    = '\33[5m'
+    CBLINK2   = '\33[6m'
+    CSELECTED = '\33[7m'
+
+    CBLACK  = '\33[30m'
+    CRED    = '\33[31m'
+    CGREEN  = '\33[32m'
+    CYELLOW = '\33[33m'
+    CBLUE   = '\33[34m'
+    CVIOLET = '\33[35m'
+    CBEIGE  = '\33[36m'
+    CWHITE  = '\33[37m'
+    CGREY   = '\33[90m'
+
+    CBLACKBG  = '\33[40m'
+    CREDBG    = '\33[41m'
+    CGREENBG  = '\33[42m'
+    CYELLOWBG = '\33[43m'
+    CBLUEBG   = '\33[44m'
+    CVIOLETBG = '\33[45m'
+    CBEIGEBG  = '\33[46m'
+    CWHITEBG  = '\33[47m'
 
 
 def expand_html(html: str) -> str:
@@ -28,7 +62,9 @@ def expand_html(html: str) -> str:
     return "".join(expanded_html).strip()
 
 
-def parse_css(data: str) -> dict[str, dict[str, str]]:
+Style: TypeAlias = dict[str,dict[str,str]]
+
+def parse_css(data: str) -> Style:
     """
     Naive css parser
     Returns a dict from selector to a dict of rules to values
@@ -174,6 +210,39 @@ class HTMLTag:
 
         return add_to
 
+    def get_attrs(self, filter:str|None = None, split:str|None = None, add_to:list[tuple[str,str]]|list[str]|None = None) -> list[tuple[str,str]] | list[str]:
+        """
+        Returns `attr`s of `self` and its parents. Attributes of `self` will be first, and each
+        subsequent parent will be later in the list
+
+        If `filter` is not `None` returns a `list[str]` of only attributes matching `filter`
+        Otherwise returns a `list[tuple[str,str]]` of attributes and their value
+
+        If `split` is not `None` the values of the attrs will be split on `split` before being returned
+        """
+        if add_to == None:
+            add_to = []
+        
+        if filter is None:
+            if split is None:
+                add_to += self.attrs
+            else:
+                for attr, val in self.attrs:
+                    for v in val.split(split):
+                        add_to.append((attr, v,))
+        else:
+            for attr, val in self.attrs:
+                if attr == filter:
+                    if split is None:
+                        add_to.append(val)
+                    else:
+                        add_to += val.split(split)
+        
+        if self.parent is not None:
+            self.parent.get_attrs(filter=filter, split=split, add_to=add_to)
+
+        return add_to
+
 
 class MyHTMLParser(HTMLParser):
     def __init__(self):
@@ -205,6 +274,174 @@ class MyHTMLParser(HTMLParser):
         self.current.contains.append(data)
 
 
+class HTMLReader:
+    def __init__(self, parsed_html):
+        self.parsed_html = parsed_html
+
+        self.style = parsed_html.find("style")
+        assert(len(self.style.contains) == 1 and not isinstance(self.style.contains[0], HTMLTag))
+        self.style = parse_css(self.style.contains[0])
+
+        self.vocab_container: HTMLTag|None = None
+
+    def read_html(self):
+        self.vocab_container = self.parsed_html.find("h1").parent
+
+        # list of header names where `current_header[n]` represehts the header `n+1`
+        # (ie. h1 would be at n=0, h2 would be at n=2, etc.)
+        current_headers: list[str|None] = []
+
+        for html_tag in self.vocab_container.contains:
+            if not isinstance(html_tag, HTMLTag):
+                continue
+
+            # Get the header
+            if len(html_tag.tag) == 2 and html_tag.tag[0] == 'h' and html_tag.tag[1] in "123456789":
+                header_depth = int(html_tag.tag[1])
+                if len(current_headers) >= header_depth:
+                    current_headers = current_headers[:header_depth-1]
+
+                elif len(current_headers) < header_depth - 1:
+                    current_headers += [None] * (header_depth - 1 - len(current_headers))
+                
+                header_name = ""
+                for data, data_tag in html_tag.flattened_data():
+                    if data_tag.tag == "span":
+                        header_name += data.replace('\xa0', ' ') # replace no-break-spaces with regular spaces
+                current_headers.append(header_name)
+                print(current_headers)
+
+            # Get the english/latin vocab
+            elif len(current_headers) > 0:
+                if current_headers[-1] == "Numerals": # Numerals are a special case
+                    pass
+                else:
+                    if html_tag.tag == 'p':
+                        vocab_reader = VocabReader(self.style, html_tag)
+                        vocab_reader.read_data()
+
+
+class VocabReader:
+    def __init__(self, style: Style, html_tag: HTMLTag):
+        self.style = style
+        self.html_tag = html_tag
+        self.vocab_data = html_tag.flattened_data()
+    
+    @staticmethod
+    def is_latin(data_block: tuple[str, HTMLTag], style: Style) -> bool:
+        for tag_class in data_block[1].get_attrs("class", ' '):
+            tag_class = '.' + tag_class
+            if tag_class not in style:
+                continue
+            if "font-weight" in style[tag_class] and style[tag_class]["font-weight"] == "700":
+                return True
+        return False
+
+    @staticmethod
+    def is_definition(data_block: tuple[str, HTMLTag], style: Style) -> bool:
+        for tag_class in data_block[1].get_attrs("class", ' '):
+            tag_class = '.' + tag_class
+            if tag_class not in style:
+                continue
+            if "font-style" in style[tag_class] and style[tag_class]["font-style"] == "italic":
+                return True
+        return False
+    
+    def is_verb(self) -> bool:
+        if len(self.vocab_data) == 0:
+            return False
+        
+        if not self.is_latin(self.vocab_data[0], self.style):
+            return False
+
+        principal_parts = [part.strip() for part in self.vocab_data[0][0].split(',')]
+        if len(principal_parts) in (3,4,):
+            if len(principal_parts[1]) > 2 and principal_parts[1][-2:] == "re":
+                return True
+            if principal_parts[1] in ("posse", "esse",): # Exceptions
+                return True
+        
+        return False
+
+    def is_adverb(self) -> bool:
+        # raise NotImplementedError()
+        return False
+
+    def is_noun(self) -> bool:
+        # raise NotImplementedError()
+        return False
+
+    def is_adjective(self) -> bool:
+        # raise NotImplementedError()
+        return False
+
+    def is_pronoun(self) -> bool:
+        # raise NotImplementedError()
+        return False
+
+    def is_preoposition(self) -> bool:
+        # raise NotImplementedError()
+        return False
+
+    def is_conjunction(self) -> bool:
+        # raise NotImplementedError()
+        return False
+
+    def is_interjection(self) -> bool:
+        # raise NotImplementedError()
+        return False
+
+    def determine_vocab_type(self):
+        funcs = [
+            self.is_verb, 
+            self.is_adverb, 
+            self.is_noun, 
+            self.is_adjective, 
+            self.is_pronoun, 
+            self.is_preoposition, 
+            self.is_conjunction, 
+            self.is_interjection]
+        
+        vocab_type: list[vocab.VocabType] = []
+
+        for potential_vocab_type in vocab.VocabType:
+            if funcs[potential_vocab_type.value]():
+                vocab_type.append(potential_vocab_type)
+        return vocab_type
+    
+    def convert_to_vocab_verb(self) -> vocab.Verb:
+        pass
+
+
+        
+    def read_data(self):
+        vocab_type = []
+
+        toprint = []
+        for d in self.vocab_data:
+            isgender = False
+
+            if " m." in d[0] or " f." in d[0] or " n." in d[0]:
+                isgender = True
+
+            parsed_data = d[0]
+            if self.is_latin(d, self.style):
+                parsed_data = PCol.CRED + parsed_data + PCol.CEND
+            if self.is_definition(d, self.style):
+                parsed_data = PCol.CBLUE + parsed_data + PCol.CEND
+            if isgender:
+                parsed_data = PCol.CYELLOW + parsed_data + PCol.CEND
+
+            toprint.append(parsed_data)
+        
+        vocab_type = self.determine_vocab_type()
+        prelude = ""
+        if vocab.VocabType.Verb in vocab_type:
+            prelude += PCol.CVIOLET + "[verb]" + PCol.CEND + ' '
+
+        print(prelude + f"{PCol.CGREY}|{PCol.CEND}".join(p for p in toprint))
+
+
 if __name__ == "__main__":
     parsed_html: HTMLTag|None = None
 
@@ -213,41 +450,9 @@ if __name__ == "__main__":
         parser.feed(f.readline())
         parser.close()
         parsed_html = parser.root
-
-    first_header = parsed_html.find('h1')
-    container = first_header.parent
-
-    # list of header names where `current_header[n]` represehts the header `n+1`
-    # (ie. h1 would be at n=0, h2 would be at n=2, etc.)
-    current_headers: list[str|None] = []
-
-    for i, html_tag in enumerate(container.contains):
-        if not isinstance(html_tag, HTMLTag):
-            continue
-
-        if len(html_tag.tag) == 2 and html_tag.tag[0] == 'h' and html_tag.tag[1] in "123456789":
-            header_depth = int(html_tag.tag[1])
-            if len(current_headers) >= header_depth:
-                current_headers = current_headers[:header_depth-1]
-
-            elif len(current_headers) < header_depth - 1:
-                current_headers += [None] * (header_depth - 1 - len(current_headers))
-            
-            header_name = ""
-            for data, data_tag in html_tag.flattened_data():
-                if data_tag.tag == "span":
-                    header_name += data.replace('\xa0', ' ') # replace no-break-spaces with regular spaces
-            current_headers.append(header_name)
-            print(current_headers)
-
-        elif len(current_headers) > 0:
-            if current_headers[-1] == "Numerals": # Numerals are a special case
-                pass
-            else:
-                pass
-
-    # print(container.pretty_print()[:5000])
-
+    
+    html_reader = HTMLReader(parsed_html)
+    html_reader.read_html()
 
     if False:
         expanded_html = None

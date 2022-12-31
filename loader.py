@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from html.parser import HTMLParser
 from typing import TypeAlias
+import string
 
 import vocab
+import logging
 
 
 class PCol:
@@ -148,10 +150,6 @@ class LatinDictHTMLParser(HTMLParser):
             # Numerals are a special case
             if self.headers[-1][0] == "Numerals":
                 pass
-        
-        # if data[:5] == "CAPVT":
-        #     print(data)
-        #     print(self.current_tags)
 
 
 class HTMLTag:
@@ -326,32 +324,63 @@ class VocabReader:
         self.style = style
         self.html_tag = html_tag
         self.vocab_data = html_tag.flattened_data()
+        self.vocab: vocab.Vocab|None = None
+
+        self.debug_parsing_info = None
     
-    @staticmethod
-    def is_latin(data_block: tuple[str, HTMLTag], style: Style) -> bool:
+    def is_latin(self, data_block: tuple[str, HTMLTag]) -> bool:
         for tag_class in data_block[1].get_attrs("class", ' '):
             tag_class = '.' + tag_class
-            if tag_class not in style:
+            if tag_class not in self.style:
                 continue
-            if "font-weight" in style[tag_class] and style[tag_class]["font-weight"] == "700":
+            if "font-weight" in self.style[tag_class] and self.style[tag_class]["font-weight"] == "700":
                 return True
         return False
 
-    @staticmethod
-    def is_definition(data_block: tuple[str, HTMLTag], style: Style) -> bool:
+    def is_definition(self, data_block: tuple[str, HTMLTag]) -> bool:
         for tag_class in data_block[1].get_attrs("class", ' '):
             tag_class = '.' + tag_class
-            if tag_class not in style:
+            if tag_class not in self.style:
                 continue
-            if "font-style" in style[tag_class] and style[tag_class]["font-style"] == "italic":
+            if "font-style" in self.style[tag_class] and self.style[tag_class]["font-style"] == "italic":
                 return True
         return False
+    
+    def find_in_data(self, substr: str, word:bool = False, latin:bool|None = None, definition:bool|None = None) -> tuple[int,int]:
+        """
+        If `substr` is in `self.vocab_data` returns a tuple of two indexes `[i,j]` giving the
+        location of `substr` in `self.vocab_data` (ie. `self.vocab_data[i][0][j:len(substr)] == substr`)
+
+        Will return the first match (lowest `i` then lowest `j`). Returns `(-1,-1)` for no match.
+
+        If `word` is `True`, only returns matches where the `substr` is surrounded by non ascii characters
+        
+        If `latin` is `False`, only returns matches where `self.vocab_data[i]` is latin and vice versa.
+
+        If `definition` is `False`, only returns matches where `self.vocab_data[i]` is a definition and vice versa.
+        """
+        for i, (data_chunk, tag,) in enumerate(self.vocab_data):
+            if latin is not None:
+                if self.is_latin((data_chunk, tag,)) != latin:
+                    continue
+            
+            if definition is not None:
+                if self.is_definition((data_chunk, tag,)) != definition:
+                    continue
+
+            if (index := data_chunk.find(substr)) != -1:
+                if not word or (
+                        (index == 0 or data_chunk[index-1] not in string.ascii_letters) and 
+                        (index+len(substr) == len(data_chunk) or data_chunk[index+len(substr)] not in string.ascii_letters)):
+                    return (i, index,)
+
+        return (-1,-1)
     
     def is_verb(self) -> bool:
         if len(self.vocab_data) == 0:
             return False
         
-        if not self.is_latin(self.vocab_data[0], self.style):
+        if not self.is_latin(self.vocab_data[0]):
             return False
 
         principal_parts = [part.strip() for part in self.vocab_data[0][0].split(',')]
@@ -364,8 +393,7 @@ class VocabReader:
         return False
 
     def is_adverb(self) -> bool:
-        # raise NotImplementedError()
-        return False
+        return self.find_in_data("adv.", word=True, latin=False) != (-1,-1,)
 
     def is_noun(self) -> bool:
         # raise NotImplementedError()
@@ -376,20 +404,16 @@ class VocabReader:
         return False
 
     def is_pronoun(self) -> bool:
-        # raise NotImplementedError()
-        return False
+        return self.find_in_data("pron.", word=True, latin=False) != (-1,-1,)
 
     def is_preoposition(self) -> bool:
-        # raise NotImplementedError()
-        return False
+        return self.find_in_data("prep.", word=True, latin=False) != (-1,-1,)
 
     def is_conjunction(self) -> bool:
-        # raise NotImplementedError()
-        return False
+        return self.find_in_data("conj.", word=True, latin=False) != (-1,-1,)
 
     def is_interjection(self) -> bool:
-        # raise NotImplementedError()
-        return False
+        return self.find_in_data("interj.", word=True, latin=False) != (-1,-1,)
 
     def determine_vocab_type(self):
         funcs = [
@@ -408,12 +432,57 @@ class VocabReader:
             if funcs[potential_vocab_type.value]():
                 vocab_type.append(potential_vocab_type)
         return vocab_type
-    
+
     def convert_to_vocab_verb(self) -> vocab.Verb:
-        pass
+        principal_parts = [part.strip() for part in self.vocab_data[0][0].split(',')]
+        if len(principal_parts) == "3":
+            principal_parts.append("")
+        principal_parts = tuple(principal_parts)
+        verb = vocab.Verb(principal_parts, '')
 
+        if len(self.vocab_data) == 3 and self.vocab_data[1][0] == ", " and self.is_definition(self.vocab_data[2]):
+            assert self.vocab_data[2][0][:3] == "to "
+            verb.english = self.vocab_data[2][0]
+        else:
+            for data, tag in self.vocab_data:
+                if self.is_definition((data, tag,)):
+                    if data[:3] == "to ":
+                        verb.english = data
 
-        
+            print(self.debug_parsing_info)
+            print(verb)
+
+            # Deal with irregulars
+            (i,j,) = self.find_in_data("imp.", word=True, latin=False, definition=False)
+            if (i,j,) != (-1,-1,):
+                if "sg." in self.vocab_data[i][0][j:]:
+                    pass
+                else:
+                    logging.warning(f"Potential irregular case unhandled: {self.debug_parsing_info}")
+
+        return verb
+
+    def convert_to_vocab_adverb(self) -> vocab.Adverb:
+        raise NotImplementedError()
+
+    def convert_to_vocab_noun(self) -> vocab.Noun:
+        raise NotImplementedError()
+
+    def convert_to_vocab_adjective(self) -> vocab.Adjective:
+        raise NotImplementedError()
+
+    def convert_to_vocab_pronoun(self) -> vocab.Pronoun:
+        raise NotImplementedError()
+
+    def convert_to_vocab_preoposition(self) -> vocab.Preoposition:
+        raise NotImplementedError()
+
+    def convert_to_vocab_conjunction(self) -> vocab.Conjunction:
+        raise NotImplementedError()
+
+    def convert_to_vocab_interjection(self) -> vocab.Interjection:
+        raise NotImplementedError()
+
     def read_data(self):
         vocab_type = []
 
@@ -425,9 +494,9 @@ class VocabReader:
                 isgender = True
 
             parsed_data = d[0]
-            if self.is_latin(d, self.style):
+            if self.is_latin(d):
                 parsed_data = PCol.CRED + parsed_data + PCol.CEND
-            if self.is_definition(d, self.style):
+            if self.is_definition(d):
                 parsed_data = PCol.CBLUE + parsed_data + PCol.CEND
             if isgender:
                 parsed_data = PCol.CYELLOW + parsed_data + PCol.CEND
@@ -438,8 +507,37 @@ class VocabReader:
         prelude = ""
         if vocab.VocabType.Verb in vocab_type:
             prelude += PCol.CVIOLET + "[verb]" + PCol.CEND + ' '
+        if vocab.VocabType.Adverb in vocab_type:
+            prelude += PCol.CVIOLET + "[adv.]" + PCol.CEND + ' '
+        if vocab.VocabType.Noun in vocab_type:
+            prelude += PCol.CVIOLET + "[noun]" + PCol.CEND + ' '
+        if vocab.VocabType.Adjective in vocab_type:
+            prelude += PCol.CVIOLET + "[adj.]" + PCol.CEND + ' '
+        if vocab.VocabType.Pronoun in vocab_type:
+            prelude += PCol.CVIOLET + "[pron.]" + PCol.CEND + ' '
+        if vocab.VocabType.Preposition in vocab_type:
+            prelude += PCol.CVIOLET + "[prep.]" + PCol.CEND + ' '
+        if vocab.VocabType.Conjunction in vocab_type:
+            prelude += PCol.CVIOLET + "[conj.]" + PCol.CEND + ' '
+        if vocab.VocabType.Interjection in vocab_type:
+            prelude += PCol.CVIOLET + "[interj.]" + PCol.CEND + ' '
 
-        print(prelude + f"{PCol.CGREY}|{PCol.CEND}".join(p for p in toprint))
+        self.debug_parsing_info = prelude + f"{PCol.CGREY}|{PCol.CEND}".join(p for p in toprint)
+        
+        if len(vocab_type) == 1:
+            funcs = [
+                self.convert_to_vocab_verb, 
+                self.convert_to_vocab_adverb, 
+                self.convert_to_vocab_noun, 
+                self.convert_to_vocab_adjective, 
+                self.convert_to_vocab_pronoun, 
+                self.convert_to_vocab_preoposition, 
+                self.convert_to_vocab_conjunction, 
+                self.convert_to_vocab_interjection]
+            try:
+                self.vocab = funcs[vocab_type[0].value]()
+            except NotImplementedError:
+                pass
 
 
 if __name__ == "__main__":

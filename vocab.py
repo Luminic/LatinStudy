@@ -2,6 +2,13 @@ from typing import TypeAlias
 from enum import Enum
 
 
+a_macron = 'ā'
+e_macron = 'ē'
+i_macron = 'ī'
+o_macron = 'ō'
+u_macron = 'ū'
+
+
 class Gender(Enum):
     Unknown = 0
     Masc = 1
@@ -32,16 +39,37 @@ class Vocab:
 PrincipalParts: TypeAlias = tuple[str,str,str,str]
 
 class Verb(Vocab):
-    @staticmethod
-    def determine_conjugation(principal_parts: PrincipalParts) -> int:
-        raise NotImplementedError()
-
     def __init__(self, principal_parts: PrincipalParts, english: list[str]):
         super().__init__()
 
         self.principal_parts = principal_parts
         self.english = english
-        self.conjugation = 0
+        self.special_cases:dict[str,str] = {}
+
+        self.conjugation:int = -1
+        self.conjugations:dict[str,dict[str,str]] = {}
+    
+    def __str__(self):
+        return ", ".join(self.principal_parts) + ": " + self.english
+    
+    def load(self):
+        self.conjugation = self.determine_conjugation()
+
+    def determine_conjugation(self) -> int:
+        assert len(self.principal_parts) in (3,4,) and len(self.principal_parts[1]) >= 3
+        if self.principal_parts[1][-3:] == "āre":
+            return 1
+        elif self.principal_parts[1][-3:] == "ēre":
+            return 2
+        elif self.principal_parts[1][-3:] == "ere":
+            return 3
+        elif self.principal_parts[1][-3:] == "īre":
+            return 4
+        return -1
+
+
+class Adverb(Vocab):
+    pass
 
 
 class Declinable(Vocab):
@@ -75,3 +103,19 @@ class Adjective(Declinable):
         self.fem = fem
         self.neut = neut
         self.english = english
+
+
+class Pronoun(Vocab):
+    pass
+
+class Preoposition(Vocab):
+    pass
+
+class Conjunction(Vocab):
+    pass
+
+class Interjection(Vocab):
+    pass
+
+class Unknown(Vocab):
+    pass

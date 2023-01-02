@@ -456,10 +456,11 @@ class VocabReader:
             (i,j,) = self.find_in_data("imp.", word=True, latin=False, definition=False)
             if (i,j,) != (-1,-1,):
                 if "sg." in self.vocab_data[i][0][j:]:
-                    pass
+                    logging.warning(f"Irregular case unhandled: {self.debug_parsing_info}")
                 else:
                     logging.warning(f"Potential irregular case unhandled: {self.debug_parsing_info}")
-
+        
+        verb.load()
         return verb
 
     def convert_to_vocab_adverb(self) -> vocab.Adverb:

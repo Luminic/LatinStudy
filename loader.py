@@ -283,6 +283,8 @@ class HTMLReader:
         self.vocab_container: HTMLTag|None = None
 
     def read_html(self):
+        resulting_vocab = {}
+
         self.vocab_container = self.parsed_html.find("h1").parent
 
         # list of header names where `current_header[n]` represehts the header `n+1`
@@ -309,6 +311,8 @@ class HTMLReader:
                 current_headers.append(header_name)
                 print(current_headers)
 
+                resulting_vocab[header_name] = []
+
             # Get the english/latin vocab
             elif len(current_headers) > 0:
                 if current_headers[-1] == "Numerals": # Numerals are a special case
@@ -316,7 +320,11 @@ class HTMLReader:
                 else:
                     if html_tag.tag == 'p':
                         vocab_reader = VocabReader(self.style, html_tag)
-                        vocab_reader.read_data()
+                        if (vocab := vocab_reader.read_data()) is not None:
+                            assert len(current_headers) >= 1 and current_headers[-1] in resulting_vocab
+                            resulting_vocab[current_headers[-1]].append(vocab)
+
+        return resulting_vocab
 
 
 class VocabReader:
@@ -484,7 +492,7 @@ class VocabReader:
     def convert_to_vocab_interjection(self) -> vocab.Interjection:
         raise NotImplementedError()
 
-    def read_data(self):
+    def read_data(self) -> vocab.Vocab | None:
         vocab_type = []
 
         toprint = []
@@ -539,6 +547,11 @@ class VocabReader:
                 self.vocab = funcs[vocab_type[0].value]()
             except NotImplementedError:
                 pass
+        
+        if self.vocab is not None:
+            self.vocab.description = self.debug_parsing_info
+        
+        return self.vocab
 
 
 if __name__ == "__main__":
@@ -551,7 +564,12 @@ if __name__ == "__main__":
         parsed_html = parser.root
     
     html_reader = HTMLReader(parsed_html)
-    html_reader.read_html()
+    parsed_vocab = html_reader.read_html()
+
+    import visualizer
+    vis = visualizer.Visualizer()
+    vis.vocab = parsed_vocab
+    vis.visualize()
 
     if False:
         expanded_html = None

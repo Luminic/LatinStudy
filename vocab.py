@@ -33,7 +33,10 @@ class VocabType(Enum):
 
 class Vocab:
     def __init__(self):
-        pass
+        self.description = ""
+    
+    def __hash__(self):
+        return hash(self.description)
 
 
 PrincipalParts: TypeAlias = tuple[str,str,str,str]
@@ -155,11 +158,11 @@ class Verb(Vocab):
         self.conjugations[Mood.Imperative] = [prog_stem, prog_stem + "te"]
 
     def third_conjugation(self):
-        self.conjugations[Mood.Imperative] = self.principal_parts[1]
+        self.conjugations[Mood.Infinitive] = self.principal_parts[1]
         raise NotImplementedError
 
     def fourth_conjugation(self):
-        self.conjugations[Mood.Imperative] = self.principal_parts[1]
+        self.conjugations[Mood.Infinitive] = self.principal_parts[1]
         raise NotImplementedError
     
     def load(self):

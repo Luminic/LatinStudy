@@ -457,14 +457,21 @@ class VocabReader:
                     if data[:3] == "to ":
                         verb.english = data
 
-            print(self.debug_parsing_info)
-            print(verb)
+            # print(self.debug_parsing_info)
+            # print(verb)
 
             # Deal with irregulars
             (i,j,) = self.find_in_data("imp.", word=True, latin=False, definition=False)
             if (i,j,) != (-1,-1,):
                 if "sg." in self.vocab_data[i][0][j:]:
-                    logging.warning(f"Irregular case unhandled: {self.debug_parsing_info}")
+                    if self.is_latin(self.vocab_data[i+1]):
+                        verb.special_cases[(
+                            (vocab.Mood.__name__, vocab.Mood.Imperative.name,),
+                            (vocab.Number.__name__, vocab.Number.Singular.name),
+                        )] = self.vocab_data[i+1][0].strip()
+                        logging.warning(f"regular case unhandled: {((vocab.Mood.__name__, vocab.Mood.Imperative.name,),(vocab.Number.__name__, vocab.Number.Singular.name),)} = {self.vocab_data[i+1][0].strip()}")
+                    else:
+                        logging.warning(f"Irregular case unhandled: {self.debug_parsing_info}")
                 else:
                     logging.warning(f"Potential irregular case unhandled: {self.debug_parsing_info}")
         

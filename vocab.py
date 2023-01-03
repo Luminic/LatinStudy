@@ -89,7 +89,18 @@ class Verb(Vocab):
 
         self.principal_parts = principal_parts
         self.english = english
-        self.special_cases:dict[str,str] = {}
+
+        self.special_cases:dict[tuple[tuple[str, str], ...],str] = {}
+        """
+        Dictionary from the parsing of a case to an irregular conjugation for that parsing
+
+        example keys
+        `(("Mood", "Imperative"), ("Number", "Singular"))`
+        or
+        `(("Mood", "Indicative"), ("Number", "Singular"), ("Person", "First"), ("Tense", "Pluperfect"))`
+
+        Mood must come first. The order of the others doesn't matter
+        """
 
         self.conjugation:int = -1
 
@@ -110,8 +121,6 @@ class Verb(Vocab):
         return ", ".join(self.principal_parts) + ": " + self.english
     
     def first_and_second_conjugation(self):
-        self.conjugations[Mood.Infinitive] = self.principal_parts[1]
-
         prog_stem:str = self.conjugations[Mood.Infinitive][:-2]
         prog_suffixes = (
             "ō", "mus",
@@ -158,15 +167,14 @@ class Verb(Vocab):
         self.conjugations[Mood.Imperative] = [prog_stem, prog_stem + "te"]
 
     def third_conjugation(self):
-        self.conjugations[Mood.Infinitive] = self.principal_parts[1]
         raise NotImplementedError
 
     def fourth_conjugation(self):
-        self.conjugations[Mood.Infinitive] = self.principal_parts[1]
         raise NotImplementedError
     
-    def load(self):
-        self.conjugation = self.determine_conjugation()
+    def conjugate(self):
+        self.conjugations[Mood.Infinitive] = self.principal_parts[1]
+
         conjugation_funcs = [
             self.first_and_second_conjugation,
             self.first_and_second_conjugation,
@@ -175,9 +183,32 @@ class Verb(Vocab):
         ]
         try:
             conjugation_funcs[self.conjugation-1]()
+
+            mood = None
+            total_parsing = None
+            for parsing, conjugation in self.special_cases.items():
+                for i, (parse_type, parse,) in enumerate(parsing):
+                    if i == 0:
+                        assert parse_type == Mood.__name__
+                        mood = Mood[parse]
+                    else:
+                        if total_parsing == None: total_parsing = 0
+
+                        potential_types = (Number, Person, Time, Aspect, Tense,)
+                        potential_types = {pt.__name__ : pt for pt in potential_types}
+                        total_parsing += potential_types[parse_type][parse].value
+                
+                if total_parsing is None:
+                    self.conjugations[mood] = conjugation
+                else:
+                    self.conjugations[mood][total_parsing] = conjugation
+
         except NotImplementedError:
             logging.warning(f"Cannot yet conjugate {self.conjugation}-th conjugation verbs")
-        print(self.conjugations)
+    
+    def load(self):
+        self.conjugation = self.determine_conjugation()
+        self.conjugate()
 
     def determine_conjugation(self) -> int:
         assert len(self.principal_parts) in (3,4,) and len(self.principal_parts[1]) >= 3

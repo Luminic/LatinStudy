@@ -7,6 +7,18 @@ e_macron = 'ē'
 i_macron = 'ī'
 o_macron = 'ō'
 u_macron = 'ū'
+vowels = "aeiou"
+long_vowels = a_macron + e_macron + i_macron + o_macron + u_macron
+
+def make_short(vowel:str):
+    if (i := long_vowels.find(vowel)) != -1:
+        return vowels[i]
+    return vowel
+
+def make_long(vowel:str):
+    if (i := vowels.find(vowel)) != -1:
+        return long_vowels[i]
+    return vowel
 
 
 class Gender(IntEnum):
@@ -208,15 +220,15 @@ class Verb(Vocab):
 
         self.conjugations[Mood.Imperative] = [prog_stem, prog_stem + "te"]
 
-    def _third_conjugation(self):
+    def _third_and_fourth_conjugation(self):
         prog_stem:str = self.conjugations[Mood.Infinitive][:-2]
 
         self.conjugations[Mood.Indicative] = [""] * len(Number) * len(Person) * len(Tense)
 
         pres_suffixes = (
-            "ō", "imus",
-            "is", "itis",
-            "it", "unt",
+            "ō", "mus",
+            "s", "tis",
+            "t", "unt",
         )
 
         imperf_suffixes = (
@@ -235,22 +247,43 @@ class Verb(Vocab):
             for num in Number:
                 for time in Time:
                     suffix = None
+
                     if time == Time.Present:
                         suffix = pres_suffixes[pers+num]
+
                     elif time == Time.Past:
                         suffix = imperf_suffixes[pers+num]
+
                     elif time == Time.Future:
                         suffix = fut_suffixes[pers+num]
                     
-                    conj = prog_stem[:-1] + suffix
+                    modified_stem = ""
+
+                    if self.conjugation == 3:
+                        modified_stem = prog_stem[:-1]
+                        
+                        if self.principal_parts[0].endswith("iō"):
+                            modified_stem += 'i'
+
+                        elif time == Time.Present and not (
+                                (pers == Person.First and num == Number.Singular)
+                                or (pers == Person.Third and num == Number.Plural)):
+                            modified_stem += 'i'
+                        
+                    elif self.conjugation == 4:
+                        assert prog_stem[-1] == 'ī'
+                        if suffix[0] in (vowels + long_vowels) or suffix[-1] == 't':
+                            modified_stem = self._replace_ending(prog_stem, 'ī', 'i')
+                        else:
+                            modified_stem = prog_stem
+
+                    conj = modified_stem + suffix
                     self.conjugations[Mood.Indicative][Aspect.Progressive + time + pers + num] = conj
 
         self._perfect_active_conjugation()
         
-        self.conjugations[Mood.Imperative] = [prog_stem, prog_stem[:-1] + "ite"]
-
-    def _fourth_conjugation(self):
-        raise NotImplementedError
+        self.conjugations[Mood.Imperative] = [prog_stem, prog_stem + "te"]
+        self._replace_ending(self.conjugations[Mood.Imperative][Number.Plural], "ete", "ite")
     
     def conjugate(self):
         self.conjugations[Mood.Infinitive] = self.principal_parts[1]
@@ -258,8 +291,8 @@ class Verb(Vocab):
         conjugation_funcs = [
             self._first_and_second_conjugation,
             self._first_and_second_conjugation,
-            self._third_conjugation,
-            self._fourth_conjugation
+            self._third_and_fourth_conjugation,
+            self._third_and_fourth_conjugation
         ]
         try:
             conjugation_funcs[self.conjugation-1]()

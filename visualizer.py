@@ -44,6 +44,81 @@ class Visualizer:
         self.vocab_info:dict[Vocab, dict[str, Any]] = {}
         self.vocab_expansion_callback = []
     
+    def create_verb_info_group(self, verb:Verb):
+        with dpg.group() as verb_info_group:
+            if verb.conjugations[Mood.Infinitive] is not None:
+                text_header = dpg.add_text("Infinitive")
+                dpg.bind_item_font(text_header, self.bold_font)
+                dpg.add_text(verb.conjugations[Mood.Infinitive])
+                dpg.add_separator()
+
+            if verb.conjugations[Mood.Indicative] is not None:
+                text_header = dpg.add_text("Indicative")
+                dpg.bind_item_font(text_header, self.bold_font)
+
+                with dpg.group(horizontal=True):
+                    for tense in Tense:
+                        with dpg.group():
+                            dpg.add_text(tense.name)
+
+                            with dpg.table(header_row=True, policy=dpg.mvTable_SizingFixedFit,
+                                    row_background=True, resizable=False, no_host_extendX=True,
+                                    borders_innerV=True, delay_search=True, borders_outerV=True,
+                                    borders_outerH=True):
+
+                                dpg.add_table_column()
+                                dpg.add_table_column(label="sg.")
+                                dpg.add_table_column(label="pl.")
+
+                                row_headers = ("1st", "2nd", "3rd",)
+
+                                for i, pers in enumerate(Person):
+                                    with dpg.table_row():
+                                        dpg.add_text(row_headers[i])
+                                        for num in Number:
+                                            dpg.add_text(verb.conjugations[Mood.Indicative][num+pers+tense])
+
+                        dpg.add_spacer()
+                dpg.add_separator()
+
+            if verb.conjugations[Mood.Imperative] is not None:
+                text_header = dpg.add_text("Imperative")
+                dpg.bind_item_font(text_header, self.bold_font)
+                dpg.add_text(", ".join(verb.conjugations[Mood.Imperative]))
+                dpg.add_separator()
+            
+            dpg.add_spacer()
+            return verb_info_group
+
+    def create_declension_table(self, cases:list[str]):
+        with dpg.table(header_row=True, policy=dpg.mvTable_SizingFixedFit,
+                row_background=True, resizable=False, no_host_extendX=True, borders_innerV=True,
+                delay_search=True, borders_outerV=True, borders_outerH=True) as decl_table:
+            dpg.add_table_column()
+            dpg.add_table_column(label="sg.")
+            dpg.add_table_column(label="pl.")
+
+            row_headers = ("nom", "gen", "dat", "acc", "abl", "voc")
+
+            for i, case, in enumerate(Case):
+                with dpg.table_row():
+                    dpg.add_text(row_headers[i])
+                    for num in Number:
+                        dpg.add_text(cases[case + num])
+
+            return decl_table
+
+    def create_noun_info_group(self, noun:Noun):
+        with dpg.group() as noun_info_group:
+            th_ending = lambda x: ("st", "nd", "rd")[x-1] if 1 <= x <= 3 else "th"
+            text_header = dpg.add_text(f"{noun.declension}{th_ending(noun.declension)}-declension {noun.gender.name.lower()} noun:")
+            dpg.bind_item_font(text_header, self.bold_font)
+            
+            self.create_declension_table(noun.cases)
+
+            dpg.add_spacer()
+            return noun_info_group
+    
     def create_vocab_info_group(self, vocab:Vocab, toggle:int = 0):
         """
         Show/hide the vocab's information. Returns the group with the information. The group is put under `self.vocab_info[vocab]["group"]`
@@ -62,58 +137,18 @@ class Visualizer:
             with dpg.group(parent=self.vocab_info[vocab]["group"], horizontal=True) as vocab_info_group:
                 dpg.add_spacer()
                 dpg.add_spacer()
+                self.vocab_info[vocab]["expanded"] = vocab_info_group
 
-                with dpg.group():
-                    self.vocab_info[vocab]["expanded"] = vocab_info_group
-                    if isinstance(vocab, Verb):
-                        if vocab.conjugations[Mood.Infinitive] is not None:
-                            text_header = dpg.add_text("Infinitive")
-                            dpg.bind_item_font(text_header, self.bold_font)
-                            dpg.add_text(vocab.conjugations[Mood.Infinitive])
-                            dpg.add_separator()
+                if isinstance(vocab, Verb):
+                    self.create_verb_info_group(vocab)
 
-                        if vocab.conjugations[Mood.Indicative] is not None:
-                            text_header = dpg.add_text("Indicative")
-                            dpg.bind_item_font(text_header, self.bold_font)
-
-                            with dpg.group(horizontal=True):
-                                for tense in Tense:
-                                    with dpg.group():
-                                        dpg.add_text(tense.name)
-
-                                        with dpg.table(header_row=True, policy=dpg.mvTable_SizingFixedFit,
-                                            row_background=True, resizable=False, no_host_extendX=True, borders_innerV=True,
-                                            delay_search=True, borders_outerV=True, borders_outerH=True):
-
-                                            dpg.add_table_column()
-                                            dpg.add_table_column(label="sg.")
-                                            dpg.add_table_column(label="pl.")
-
-                                            row_headers = ("1st", "2nd", "3rd",)
-
-                                            for i, pers in enumerate(Person):
-                                                with dpg.table_row():
-                                                    dpg.add_text(row_headers[i])
-                                                    for num in Number:
-                                                        dpg.add_text(vocab.conjugations[Mood.Indicative][num+pers+tense])
-
-                                    dpg.add_spacer()
-                            dpg.add_separator()
-
-                        if vocab.conjugations[Mood.Imperative] is not None:
-                            text_header = dpg.add_text("Imperative")
-                            dpg.bind_item_font(text_header, self.bold_font)
-                            dpg.add_text(", ".join(vocab.conjugations[Mood.Imperative]))
-                            dpg.add_separator()
-                    
-                    dpg.add_spacer()
-
-                    return vocab_info_group
+                if isinstance(vocab, Noun):
+                    self.create_noun_info_group(vocab)
             
         return vocab_info_group
     
     def create_vocab_list_window(self):
-        with dpg.window(label="Vocab List", tag="VocabList") as window:
+        with dpg.window(label="Vocab List", tag="VocabList", horizontal_scrollbar=True) as window:
             dpg.bind_item_theme(window, "vocab_info_inner_group_theme")
             with dpg.menu_bar():
                 with dpg.menu(label="Menu"):
@@ -145,7 +180,9 @@ class Visualizer:
 
                             cb = lambda _1, _2, voc: self.create_vocab_info_group(voc, 0)
                             cb_dat = vocab
-                            self.vocab_expansion_callback.append(lambda toggle=0, cb_dat=cb_dat: self.create_vocab_info_group(cb_dat, toggle))
+                            self.vocab_expansion_callback.append(
+                                lambda toggle=0, cb_dat=cb_dat: self.create_vocab_info_group(cb_dat, toggle)
+                            )
 
                             with dpg.group(horizontal=True, horizontal_spacing=0):
 
@@ -157,23 +194,29 @@ class Visualizer:
 
                                     i = 0
                                     if (i := s.find(PCol.CVIOLET)) != -1:
+                                        s = s.replace(PCol.CVIOLET, "")
                                         theme = "vocab_theme"
-                                    elif (i := s.find(PCol.CBLUE)) != -1:
-                                        theme = "definition_theme"
-                                        font = self.italic_font
+
                                     elif (i := s.find(PCol.CRED)) != -1:
+                                        s = s.replace(PCol.CRED, "")
                                         theme = "latin_theme"
                                         font = self.bold_font
+
+                                    elif (i := s.find(PCol.CBLUE)) != -1:
+                                        s = s.replace(PCol.CBLUE, "")
+                                        theme = "definition_theme"
+                                        font = self.italic_font
+
+                                    elif (i := s.find(PCol.CYELLOW)) != -1:
+                                        s = s.replace(PCol.CYELLOW, "")
+                                        theme = "gender_theme"
+
                                     elif (i := s.find(PCol.CGREY)) != -1:
+                                        s = s.replace(PCol.CGREY, "")
                                         theme = "debug_info_theme"
                                         if i != 0:
                                             dpg.add_button(label=s[:i], callback=cb, user_data=cb_dat)
                                         continue
-
-                                    s = s.replace(PCol.CVIOLET, "")
-                                    s = s.replace(PCol.CBLUE, "")
-                                    s = s.replace(PCol.CRED, "")
-                                    s = s.replace(PCol.CGREY, "")
 
                                     if i != 0:
                                         text = dpg.add_button(label=s[:i], callback=cb, user_data=cb_dat)
@@ -197,6 +240,10 @@ class Visualizer:
         with dpg.theme(tag="definition_theme"):
             with dpg.theme_component():
                 dpg.add_theme_color(dpg.mvThemeCol_Text, [80, 181, 255])
+        
+        with dpg.theme(tag="gender_theme"):
+            with dpg.theme_component():
+                dpg.add_theme_color(dpg.mvThemeCol_Text, [255, 255, 0])
 
         with dpg.theme(tag="debug_info_theme"):
             with dpg.theme_component():

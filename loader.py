@@ -315,6 +315,8 @@ class HTMLReader:
 
             # Get the english/latin vocab
             elif len(current_headers) > 0:
+                if len(current_headers) > 1:
+                    continue
                 if current_headers[-1] == "Numerals": # Numerals are a special case
                     pass
                 else:
@@ -354,6 +356,20 @@ class VocabReader:
                 return True
         return False
     
+    def has_gender(self, data_block: tuple[str, HTMLTag]) -> tuple[vocab.Gender,...] | None:
+        genders = []
+        if " m." in data_block[0]:
+            genders.append(vocab.Gender.Masc)
+        if " f." in data_block[0]:
+            genders.append(vocab.Gender.Fem)
+        if " n." in data_block[0]:
+            genders.append(vocab.Gender.Neut)
+
+        if len(genders) == 0:
+            return None
+        else:
+            return tuple(genders)
+    
     def find_in_data(self, substr: str, word:bool = False, latin:bool|None = None, definition:bool|None = None) -> tuple[int,int]:
         """
         If `substr` is in `self.vocab_data` returns a tuple of two indexes `[i,j]` giving the
@@ -392,8 +408,8 @@ class VocabReader:
             return False
 
         principal_parts = [part.strip() for part in self.vocab_data[0][0].split(',')]
-        if len(principal_parts) in (3,4,):
-            if len(principal_parts[1]) > 2 and principal_parts[1][-2:] == "re":
+        if len(principal_parts) in (2,3,4,):
+            if len(principal_parts[1]) >= 2 and principal_parts[1][-2:] == "re":
                 return True
             if principal_parts[1] in ("posse", "esse",): # Exceptions
                 return True
@@ -404,7 +420,16 @@ class VocabReader:
         return self.find_in_data("adv.", word=True, latin=False) != (-1,-1,)
 
     def is_noun(self) -> bool:
-        # raise NotImplementedError()
+        if len(self.vocab_data) < 3:
+            return False
+        
+        if self.is_latin(self.vocab_data[0]):
+            nom_gen = self.vocab_data[0][0].split(',')
+            if len(nom_gen) != 2: return False
+
+            if (gender := self.has_gender(self.vocab_data[1])) is not None and len(gender) == 1:
+                return True
+
         return False
 
     def is_adjective(self) -> bool:
@@ -443,8 +468,8 @@ class VocabReader:
 
     def convert_to_vocab_verb(self) -> vocab.Verb:
         principal_parts = [part.strip() for part in self.vocab_data[0][0].split(',')]
-        if len(principal_parts) == "3":
-            principal_parts.append("")
+        if len(principal_parts) < 4:
+            principal_parts += [""] * (4-len(principal_parts))
         principal_parts = tuple(principal_parts)
         verb = vocab.Verb(principal_parts, '')
 
@@ -469,20 +494,27 @@ class VocabReader:
                             (vocab.Mood.__name__, vocab.Mood.Imperative.name,),
                             (vocab.Number.__name__, vocab.Number.Singular.name),
                         )] = self.vocab_data[i+1][0].strip()
-                        logging.warning(f"regular case unhandled: {((vocab.Mood.__name__, vocab.Mood.Imperative.name,),(vocab.Number.__name__, vocab.Number.Singular.name),)} = {self.vocab_data[i+1][0].strip()}")
                     else:
                         logging.warning(f"Irregular case unhandled: {self.debug_parsing_info}")
                 else:
                     logging.warning(f"Potential irregular case unhandled: {self.debug_parsing_info}")
         
-        verb.load()
         return verb
 
     def convert_to_vocab_adverb(self) -> vocab.Adverb:
         raise NotImplementedError()
 
     def convert_to_vocab_noun(self) -> vocab.Noun:
-        raise NotImplementedError()
+        nom_sg, gen_sg = (case.strip() for case in self.vocab_data[0][0].split(","))
+        gender = self.has_gender(self.vocab_data[1])[0]
+
+        noun = vocab.Noun(nom_sg, gen_sg, gender, "")
+
+        for data, tag in self.vocab_data:
+            if self.is_definition((data, tag,)):
+                noun.english = data
+        
+        return noun
 
     def convert_to_vocab_adjective(self) -> vocab.Adjective:
         raise NotImplementedError()
@@ -504,20 +536,18 @@ class VocabReader:
 
         toprint = []
         for d in self.vocab_data:
-            isgender = False
-
-            if " m." in d[0] or " f." in d[0] or " n." in d[0]:
-                isgender = True
-
             parsed_data = d[0]
             if self.is_latin(d):
                 parsed_data = PCol.CRED + parsed_data + PCol.CEND
             if self.is_definition(d):
                 parsed_data = PCol.CBLUE + parsed_data + PCol.CEND
-            if isgender:
+            if self.has_gender(d) is not None:
                 parsed_data = PCol.CYELLOW + parsed_data + PCol.CEND
 
             toprint.append(parsed_data)
+        
+        if "".join(toprint).strip() == "":
+            return None
         
         vocab_type = self.determine_vocab_type()
         prelude = ""
@@ -553,10 +583,19 @@ class VocabReader:
             try:
                 self.vocab = funcs[vocab_type[0].value]()
             except NotImplementedError:
-                pass
+                print(self.debug_parsing_info)
+        else:
+            print(self.debug_parsing_info, f"multiple or no vocab types ({vocab_type})")
         
-        if self.vocab is not None:
-            self.vocab.description = self.debug_parsing_info
+        if self.vocab is None:
+            self.vocab = vocab.Vocab()
+            
+        self.vocab.description = self.debug_parsing_info
+
+        try:
+            self.vocab.load()
+        except NotImplementedError:
+            pass
         
         return self.vocab
 

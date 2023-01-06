@@ -34,12 +34,88 @@ class PCol:
     CBEIGEBG  = '\33[46m'
     CWHITEBG  = '\33[47m'
 
+class FilterMenu:
+    def __init__(self, visualiser):
+        self.visualiser = visualiser
+        self.vocab_types_active: dict[type|str, bool] = {}
+
+        self.text_input_group = None
+        self.text_input_rows = []
+
+        self.create()
+    
+    def remove_text_input_row(self, input_row):
+        try:
+            self.text_input_rows.remove(input_row)
+            dpg.delete_item(input_row)
+        except ValueError:
+            pass
+
+        if len(self.text_input_rows) == 0:
+            self.create_text_input_row()
+    
+    def create_text_input_row(self):
+        with dpg.table_row(parent=self.text_input_group) as input_row:
+            dpg.add_button(label="X", callback=lambda s, a, u: self.remove_text_input_row(u), user_data=input_row)
+            dpg.add_input_text(width=-1)
+            dpg.add_combo(("Off", "Word", "Word Beginning", "Word End"), default_value="Off", width=100)
+            dpg.add_combo(("Any", "Latin", "Definition"), default_value="Any", width=100)
+            self.text_input_rows.append(input_row)
+
+    def create(self):
+        with dpg.child_window(label="Filters", autosize_x=True, height=150) as filter_menu:
+            self.filter_menu = filter_menu
+
+            dpg.add_text("Filters")
+
+            vocab_types = [Noun, Verb, Adjective, "Other"]
+            for vocab_type in vocab_types:
+                self.vocab_types_active[vocab_type] = True
+
+            def vocab_type_activity_callback(vocab_type, value):
+                self.vocab_types_active[vocab_type] = value
+                self.visualiser.update_visiblity()
+
+            with dpg.group(horizontal=True):
+                for vocab_type in vocab_types:
+                    dpg.add_checkbox(
+                        label=vocab_type.__name__ if type(vocab_type) is type else vocab_type,
+                        default_value=True,
+                        callback=lambda _, val, dat: vocab_type_activity_callback(dat, val),
+                        user_data=vocab_type
+                    )
+            
+            with dpg.table(header_row=True, policy=dpg.mvTable_SizingFixedFit) as self.text_input_group:
+                dpg.add_table_column(label="")
+                dpg.add_table_column(label="Match Text", width_stretch=True)
+                dpg.add_table_column(label="Word matching")
+                dpg.add_table_column(label="Text type")
+            
+            for i in range(5):
+                self.create_text_input_row()
+            
+            dpg.add_button(label="Add Row", callback=self.create_text_input_row)
+    
+    def should_be_visible(self, vocab:Vocab) -> bool:
+        if (active := self.vocab_types_active.get(type(vocab))) is not None:
+            if not active:
+                return False
+        else:
+            if not self.vocab_types_active["Other"]:
+                return False
+        
+        return True
+
 class Visualizer:
     def __init__(self):
         self.vocab:dict[str,list[Vocab]] = {}
+
         self.default_font = None
         self.bold_font = None
         self.italic_font = None
+
+        self.vocab_window = None
+        self.filter_menu = None
         self.headers = []
         self.vocab_info:dict[Vocab, dict[str, Any]] = {}
         self.vocab_expansion_callback = []
@@ -119,37 +195,51 @@ class Visualizer:
             dpg.add_spacer()
             return noun_info_group
     
-    def create_vocab_info_group(self, vocab:Vocab, toggle:int = 0):
+    def create_vocab_info_group(self, vocab:Vocab):
         """
-        Show/hide the vocab's information. Returns the group with the information. The group is put under `self.vocab_info[vocab]["group"]`
+        Creates and returns the group with the vocab's information.
+        
+        The info group is put in `self.vocab_info[vocab]["group"]`
 
-        If `toggle = 1` the info will be shown, if `toggle = -1` the info will be hidden, and if `toggle = 0` the info's visibility will be toggled
+        If the info group is already created it will just return the group
         """
 
-        vocab_info_group = self.vocab_info[vocab]["expanded"]
+        if (vocab_info_group := self.vocab_info[vocab]["info-group"]) != None:
+            return vocab_info_group
 
-        if vocab_info_group is not None and toggle != 1:
-            dpg.delete_item(vocab_info_group)
-            self.vocab_info[vocab]["expanded"] = None
-            return None
+        with dpg.group(parent=self.vocab_info[vocab]["group"], horizontal=True) as vocab_info_group:
+            dpg.add_spacer()
+            dpg.add_spacer()
+            self.vocab_info[vocab]["info-group"] = vocab_info_group
 
-        elif vocab_info_group is None and toggle != -1:
-            with dpg.group(parent=self.vocab_info[vocab]["group"], horizontal=True) as vocab_info_group:
-                dpg.add_spacer()
-                dpg.add_spacer()
-                self.vocab_info[vocab]["expanded"] = vocab_info_group
+            if isinstance(vocab, Verb):
+                self.create_verb_info_group(vocab)
 
-                if isinstance(vocab, Verb):
-                    self.create_verb_info_group(vocab)
-
-                if isinstance(vocab, Noun):
-                    self.create_noun_info_group(vocab)
+            if isinstance(vocab, Noun):
+                self.create_noun_info_group(vocab)
             
-        return vocab_info_group
+            self.vocab_info[vocab]["expanded"] = True
+            
+            return vocab_info_group
+    
+    def toggle_vocab_info_group(self, vocab:Vocab, toggle:int = 0):
+        """
+        Show/hide the vocab's information. If the info group hasn't been created yet it will create the info group
+        """
+
+        expanded = self.vocab_info[vocab]["expanded"]
+        vocab_info_group = self.create_vocab_info_group(vocab)
+
+        if expanded and toggle != 1:
+            dpg.hide_item(vocab_info_group)
+            self.vocab_info[vocab]["expanded"] = False
+        elif not expanded and toggle != -1:
+            dpg.show_item(vocab_info_group)
+            self.vocab_info[vocab]["expanded"] = True
     
     def create_vocab_list_window(self):
-        with dpg.window(label="Vocab List", tag="VocabList", horizontal_scrollbar=True) as window:
-            dpg.bind_item_theme(window, "vocab_info_inner_group_theme")
+        with dpg.window(label="Vocab List", tag="VocabList", horizontal_scrollbar=True) as self.vocab_window:
+            # dpg.bind_item_theme(self.window, "vocab_info_inner_group_theme")
             with dpg.menu_bar():
                 with dpg.menu(label="Menu"):
                     dpg.add_menu_item(label="Load")
@@ -170,18 +260,20 @@ class Visualizer:
 
                 dpg.add_menu_item(label="Expand all", callback=expand_all)
                 dpg.add_menu_item(label="Collapse all", callback=collapse_all)
+            
+            self.filter_menu = FilterMenu(self)
 
             for header_text, vocab_list in self.vocab.items():
                 with dpg.collapsing_header(label=header_text, default_open=True) as header:
                     self.headers.append(header)
                     for vocab in vocab_list:
                         with dpg.group() as vocab_group:
-                            self.vocab_info[vocab] = {"group": vocab_group, "expanded": None}
+                            self.vocab_info[vocab] = {"group": vocab_group, "info-group": None, "expanded": False}
 
-                            cb = lambda _1, _2, voc: self.create_vocab_info_group(voc, 0)
+                            cb = lambda _1, _2, voc: self.toggle_vocab_info_group(voc, 0)
                             cb_dat = vocab
                             self.vocab_expansion_callback.append(
-                                lambda toggle=0, cb_dat=cb_dat: self.create_vocab_info_group(cb_dat, toggle)
+                                lambda toggle=0, cb_dat=cb_dat: self.toggle_vocab_info_group(cb_dat, toggle)
                             )
 
                             with dpg.group(horizontal=True, horizontal_spacing=0):
@@ -225,6 +317,9 @@ class Visualizer:
                                     text = dpg.add_button(label=s, callback=cb, user_data=cb_dat)
                                     if theme is not None: dpg.bind_item_theme(text, theme)
                                     if font is not None: dpg.bind_item_font(text, font)
+        
+        with dpg.handler_registry():
+            dpg.add_key_press_handler(key=dpg.mvKey_F, callback=lambda a,b: print(a))
 
     def visualize(self):
         dpg.create_context()
@@ -273,6 +368,15 @@ class Visualizer:
         dpg.show_viewport()
         dpg.start_dearpygui()
         dpg.destroy_context()
+    
+    def update_visiblity(self):
+        for header, vocab_list in self.vocab.items():
+            for vocab in vocab_list:
+                vocab_group = self.vocab_info[vocab]["group"]
+                if self.filter_menu.should_be_visible(vocab):
+                    dpg.show_item(vocab_group)
+                else:
+                    dpg.hide_item(vocab_group)
 
 if __name__ == "__main__":
     Visualizer().visualize()

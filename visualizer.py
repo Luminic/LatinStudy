@@ -1,66 +1,109 @@
-from typing import Any
+from __future__ import annotations
+import string
+
+from typing import Any, Callable
 import dearpygui.dearpygui as dpg
 import dearpygui.demo as demo
 
 from vocab import *
 
-class PCol:
-    CNONE = ''
 
-    CEND      = '\33[0m'
-    CBOLD     = '\33[1m'
-    CITALIC   = '\33[3m'
-    CURL      = '\33[4m'
-    CBLINK    = '\33[5m'
-    CBLINK2   = '\33[6m'
-    CSELECTED = '\33[7m'
+class TextFilter:
+    def __init__(self):
+        self.table_row = None
 
-    CBLACK  = '\33[30m'
-    CRED    = '\33[31m'
-    CGREEN  = '\33[32m'
-    CYELLOW = '\33[33m'
-    CBLUE   = '\33[34m'
-    CVIOLET = '\33[35m'
-    CBEIGE  = '\33[36m'
-    CWHITE  = '\33[37m'
-    CGREY   = '\33[90m'
+        self.text_input = None
+        self.word_match_combo = None
+        self.text_type_combo = None
+    
+    def __eq__(self, other: TextFilter):
+        if not isinstance(other, TextFilter):
+            raise ValueError
+        return self.table_row == other.table_row
+    
+    def create(self, parent=None, deletion_callback:Callable=None, filter_change_callback:Callable=None):
+        with dpg.table_row(parent=parent) as self.table_row:
+            dpg.add_button(label="X", callback=deletion_callback, user_data=self)
+            self.text_input = dpg.add_input_text(width=-1, callback=filter_change_callback)
+            self.search_parsings_checkbox = dpg.add_checkbox(callback=filter_change_callback)
+            self.match_case_checkbox = dpg.add_checkbox(callback=filter_change_callback)
+            self.match_diacritics_checkbox = dpg.add_checkbox(callback=filter_change_callback)
+            self.word_match_combo = dpg.add_combo(("Off", "Word", "Word Beginning", "Word Ending"), default_value="Off", width=100, callback=filter_change_callback)
+            self.text_type_combo = dpg.add_combo(("Any", "Latin", "Definition"), default_value="Any", width=100, callback=filter_change_callback)
+        
+        return self.table_row
+    
+    def destroy(self):
+        dpg.delete_item(self.table_row)
+    
+    def should_be_visible(self, vocab:Vocab) -> bool:
+        match dpg.get_value(self.text_type_combo):
+            case "Latin":
+                descs = [d for (d,dt) in vocab.get_parsed_description() if dt == DescBlockType.Latin]
+            case "Definition":
+                descs = [d for (d,dt) in vocab.get_parsed_description() if dt == DescBlockType.Definition]
+            case _:
+                descs = [vocab.get_clean_description()]
 
-    CBLACKBG  = '\33[40m'
-    CREDBG    = '\33[41m'
-    CGREENBG  = '\33[42m'
-    CYELLOWBG = '\33[43m'
-    CBLUEBG   = '\33[44m'
-    CVIOLETBG = '\33[45m'
-    CBEIGEBG  = '\33[46m'
-    CWHITEBG  = '\33[47m'
+        if dpg.get_value(self.search_parsings_checkbox):
+            descs.append(vocab.get_extended_description())
+
+        to_match = dpg.get_value(self.text_input)
+
+        if not dpg.get_value(self.match_case_checkbox):
+            descs = [d.lower() for d in descs]
+            to_match = to_match.lower()
+        
+        if not dpg.get_value(self.match_diacritics_checkbox):
+            descs = [make_short(d) for d in descs]
+            to_match = make_short(to_match)
+
+        for desc in descs:
+            for i in range(len(desc) - len(to_match) + 1):
+                if desc[i:i+len(to_match)] == to_match:
+                    match dpg.get_value(self.word_match_combo):
+                        case "Word":
+                            if i >= 1 and desc[i-1] in string.ascii_letters:
+                                continue
+                            elif i < len(desc) - len(to_match) and desc[i+len(to_match)] in string.ascii_letters:
+                                continue
+                        case "Word Beginning":
+                            if i >= 1 and desc[i-1] in string.ascii_letters:
+                                continue
+                        case "Word Ending":
+                            if i < len(desc) - len(to_match) and desc[i+len(to_match)] in string.ascii_letters:
+                                continue
+
+                    return True
+        return False
+
 
 class FilterMenu:
-    def __init__(self, visualiser):
+    def __init__(self, visualiser: Visualizer):
         self.visualiser = visualiser
         self.vocab_types_active: dict[type|str, bool] = {}
 
-        self.text_input_group = None
-        self.text_input_rows = []
+        self.text_filter_group = None
+        self.text_filters:list[TextFilter] = []
 
         self.create()
     
-    def remove_text_input_row(self, input_row):
-        try:
-            self.text_input_rows.remove(input_row)
-            dpg.delete_item(input_row)
-        except ValueError:
-            pass
-
-        if len(self.text_input_rows) == 0:
-            self.create_text_input_row()
+    def remove_text_input_row(self, _s, _a, text_filter: TextFilter):
+        for i in range(len(self.text_filters)):
+            if self.text_filters[i] == text_filter:
+                self.text_filters.pop(i).destroy()
+                break
+        self.create_text_input_row()
+        self.visualiser.update_visiblity()
     
     def create_text_input_row(self):
-        with dpg.table_row(parent=self.text_input_group) as input_row:
-            dpg.add_button(label="X", callback=lambda s, a, u: self.remove_text_input_row(u), user_data=input_row)
-            dpg.add_input_text(width=-1)
-            dpg.add_combo(("Off", "Word", "Word Beginning", "Word End"), default_value="Off", width=100)
-            dpg.add_combo(("Any", "Latin", "Definition"), default_value="Any", width=100)
-            self.text_input_rows.append(input_row)
+        tf = TextFilter()
+        tf.create(
+            parent=self.text_filter_group,
+            deletion_callback=self.remove_text_input_row,
+            filter_change_callback=self.visualiser.update_visiblity
+        )
+        self.text_filters.append(tf)
 
     def create(self):
         with dpg.child_window(label="Filters", autosize_x=True, height=150) as filter_menu:
@@ -85,16 +128,18 @@ class FilterMenu:
                         user_data=vocab_type
                     )
             
-            with dpg.table(header_row=True, policy=dpg.mvTable_SizingFixedFit) as self.text_input_group:
+            with dpg.table(header_row=True, policy=dpg.mvTable_SizingFixedFit) as self.text_filter_group:
                 dpg.add_table_column(label="")
                 dpg.add_table_column(label="Match Text", width_stretch=True)
+                dpg.add_table_column(label="Search parsings")
+                dpg.add_table_column(label="Match case")
+                dpg.add_table_column(label="Match diacritics")
                 dpg.add_table_column(label="Word matching")
                 dpg.add_table_column(label="Text type")
             
-            for i in range(5):
-                self.create_text_input_row()
+            self.create_text_input_row()
             
-            dpg.add_button(label="Add Row", callback=self.create_text_input_row)
+            dpg.add_button(label="Add Row", width=-1, callback=self.create_text_input_row)
     
     def should_be_visible(self, vocab:Vocab) -> bool:
         if (active := self.vocab_types_active.get(type(vocab))) is not None:
@@ -104,7 +149,12 @@ class FilterMenu:
             if not self.vocab_types_active["Other"]:
                 return False
         
+        for filter in self.text_filters:
+            if not filter.should_be_visible(vocab):
+                return False
+        
         return True
+
 
 class Visualizer:
     def __init__(self):
@@ -278,45 +328,70 @@ class Visualizer:
 
                             with dpg.group(horizontal=True, horizontal_spacing=0):
 
-                                for s in vocab.description.split(PCol.CEND):
+                                # for s in vocab.description.split(PCol.CEND.value):
+                                #     theme = None
+                                #     font = None
+
+                                #     s = s.replace(PCol.CEND.value, "")
+
+                                #     i = 0
+                                #     if (i := s.find(PCol.CVIOLET.value)) != -1:
+                                #         s = s.replace(PCol.CVIOLET.value, "")
+                                #         theme = "vocab_theme"
+
+                                #     elif (i := s.find(PCol.CRED.value)) != -1:
+                                #         s = s.replace(PCol.CRED.value, "")
+                                #         theme = "latin_theme"
+                                #         font = self.bold_font
+
+                                #     elif (i := s.find(PCol.CBLUE.value)) != -1:
+                                #         s = s.replace(PCol.CBLUE.value, "")
+                                #         theme = "definition_theme"
+                                #         font = self.italic_font
+
+                                #     elif (i := s.find(PCol.CYELLOW.value)) != -1:
+                                #         s = s.replace(PCol.CYELLOW.value, "")
+                                #         theme = "gender_theme"
+
+                                #     elif (i := s.find(PCol.CGREY.value)) != -1:
+                                #         s = s.replace(PCol.CGREY.value, "")
+                                #         theme = "debug_info_theme"
+                                #         if i != 0:
+                                #             dpg.add_button(label=s[:i], callback=cb, user_data=cb_dat)
+                                #         continue
+
+                                #     if i != 0:
+                                #         text = dpg.add_button(label=s[:i], callback=cb, user_data=cb_dat)
+                                #         s = s[i:]
+
+                                #     text = dpg.add_button(label=s, callback=cb, user_data=cb_dat)
+                                #     if theme is not None: dpg.bind_item_theme(text, theme)
+                                #     if font is not None: dpg.bind_item_font(text, font)
+
+                                for desc, desc_type in vocab.get_parsed_description():
                                     theme = None
                                     font = None
-
-                                    s = s.replace(PCol.CEND, "")
-
-                                    i = 0
-                                    if (i := s.find(PCol.CVIOLET)) != -1:
-                                        s = s.replace(PCol.CVIOLET, "")
-                                        theme = "vocab_theme"
-
-                                    elif (i := s.find(PCol.CRED)) != -1:
-                                        s = s.replace(PCol.CRED, "")
-                                        theme = "latin_theme"
-                                        font = self.bold_font
-
-                                    elif (i := s.find(PCol.CBLUE)) != -1:
-                                        s = s.replace(PCol.CBLUE, "")
-                                        theme = "definition_theme"
-                                        font = self.italic_font
-
-                                    elif (i := s.find(PCol.CYELLOW)) != -1:
-                                        s = s.replace(PCol.CYELLOW, "")
-                                        theme = "gender_theme"
-
-                                    elif (i := s.find(PCol.CGREY)) != -1:
-                                        s = s.replace(PCol.CGREY, "")
-                                        theme = "debug_info_theme"
-                                        if i != 0:
-                                            dpg.add_button(label=s[:i], callback=cb, user_data=cb_dat)
-                                        continue
-
-                                    if i != 0:
-                                        text = dpg.add_button(label=s[:i], callback=cb, user_data=cb_dat)
-                                        s = s[i:]
-
-                                    text = dpg.add_button(label=s, callback=cb, user_data=cb_dat)
+                                    match desc_type:
+                                        case DescBlockType.Text:
+                                            pass
+                                        case DescBlockType.VocabType:
+                                            theme = "vocab_theme"
+                                        case DescBlockType.Latin:
+                                            theme = "latin_theme"
+                                            font = self.bold_font
+                                        case DescBlockType.Definition:
+                                            theme = "definition_theme"
+                                            font = self.italic_font
+                                        case DescBlockType.Gender:
+                                            theme = "gender_theme"
+                                        case DescBlockType.DebugInfo:
+                                            theme = "debug_info_theme"
+                                            continue
+                                    
+                                    text = dpg.add_button(label=desc, callback=cb, user_data=cb_dat)
                                     if theme is not None: dpg.bind_item_theme(text, theme)
                                     if font is not None: dpg.bind_item_font(text, font)
+
         
         with dpg.handler_registry():
             dpg.add_key_press_handler(key=dpg.mvKey_F, callback=lambda a,b: print(a))
@@ -377,6 +452,7 @@ class Visualizer:
                     dpg.show_item(vocab_group)
                 else:
                     dpg.hide_item(vocab_group)
+
 
 if __name__ == "__main__":
     Visualizer().visualize()

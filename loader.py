@@ -600,7 +600,7 @@ class VocabReader:
         return self.vocab
 
 
-if __name__ == "__main__":
+def main():
     parsed_html: HTMLTag|None = None
 
     with open("LatinDictionary.html", 'r') as f:
@@ -626,3 +626,5 @@ if __name__ == "__main__":
             f.write(expanded_html)
 
 
+if __name__ == "__main__":
+    main()

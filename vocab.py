@@ -2,6 +2,38 @@ import logging
 from typing import TypeAlias
 from enum import Enum, IntEnum
 
+
+class PCol(Enum):
+    CNONE = ''
+
+    CEND      = '\33[0m'
+    CBOLD     = '\33[1m'
+    CITALIC   = '\33[3m'
+    CURL      = '\33[4m'
+    CBLINK    = '\33[5m'
+    CBLINK2   = '\33[6m'
+    CSELECTED = '\33[7m'
+
+    CBLACK  = '\33[30m'
+    CRED    = '\33[31m'
+    CGREEN  = '\33[32m'
+    CYELLOW = '\33[33m'
+    CBLUE   = '\33[34m'
+    CVIOLET = '\33[35m'
+    CBEIGE  = '\33[36m'
+    CWHITE  = '\33[37m'
+    CGREY   = '\33[90m'
+
+    CBLACKBG  = '\33[40m'
+    CREDBG    = '\33[41m'
+    CGREENBG  = '\33[42m'
+    CYELLOWBG = '\33[43m'
+    CBLUEBG   = '\33[44m'
+    CVIOLETBG = '\33[45m'
+    CBEIGEBG  = '\33[46m'
+    CWHITEBG  = '\33[47m'
+
+
 a_macron = 'ā'
 e_macron = 'ē'
 i_macron = 'ī'
@@ -10,15 +42,17 @@ u_macron = 'ū'
 vowels = "aeiou"
 long_vowels = a_macron + e_macron + i_macron + o_macron + u_macron
 
-def make_short(vowel:str):
-    if (i := long_vowels.find(vowel)) != -1:
-        return vowels[i]
-    return vowel
+def make_short(org_str:str):
+    new_str = org_str
+    for i in range(len(vowels)):
+        new_str = new_str.replace(long_vowels[i], vowels[i])
+    return new_str
 
-def make_long(vowel:str):
-    if (i := vowels.find(vowel)) != -1:
-        return long_vowels[i]
-    return vowel
+def make_long(org_str:str):
+    new_str = org_str
+    for i in range(len(vowels)):
+        new_str = new_str.replace(vowels[i], long_vowels[i])
+    return new_str
 
 
 class Gender(IntEnum):
@@ -42,15 +76,58 @@ class VocabType(Enum):
     Interjection = 7
 
 
+class DescBlockType(Enum):
+    Text = PCol.CNONE.value
+    VocabType = PCol.CVIOLET.value
+    Latin = PCol.CRED.value
+    Definition = PCol.CBLUE.value
+    Gender = PCol.CYELLOW.value
+    DebugInfo = PCol.CGREY.value
+
+
+
 class Vocab:
     def __init__(self):
         self.description = ""
+        self.loaded = False
     
     def __hash__(self):
         return hash(self.description)
     
     def load(self):
-        raise NotImplementedError()
+        self.loaded = True
+    
+    def get_extended_description(self):
+        return ""
+
+    def get_parsed_description(self) -> list[tuple[str, DescBlockType]]:
+        parsed_desc = []
+
+        for desc in self.description.split(PCol.CEND.value):
+            desc_block_type = DescBlockType.Text
+            cutpoint = 0
+            for dbt in DescBlockType:
+                if dbt == DescBlockType.Text:
+                    continue
+                if (cutpoint := desc.find(dbt.value)) != -1:
+                    desc = desc.replace(dbt.value, "")
+                    desc_block_type = dbt
+                    break
+
+            if cutpoint != 0:
+                parsed_desc.append((desc[:cutpoint], DescBlockType.Text,))
+                desc = desc[cutpoint:]
+        
+            parsed_desc.append((desc, desc_block_type,))
+        
+        return parsed_desc
+
+    def get_clean_description(self):
+        clean_desc = ""
+        for desc, desc_type in self.get_parsed_description():
+            if desc_type != DescBlockType.DebugInfo:
+                clean_desc += desc
+        return clean_desc
 
 
 PrincipalParts: TypeAlias = tuple[str,str,str,str]
@@ -133,6 +210,13 @@ class Verb(Vocab):
     
     def __str__(self):
         return ", ".join(self.principal_parts) + ": " + self.english
+
+    def get_extended_description(self):
+        all_conjugations = []
+        all_conjugations += self.conjugations[Mood.Indicative]
+        all_conjugations += self.conjugations[Mood.Imperative]
+        all_conjugations.append(self.conjugations[Mood.Infinitive])
+        return ", ".join(all_conjugations)
     
     def _perfect_active_conjugation(self):
         perf_stem:str = self.principal_parts[2][:-1]
@@ -320,6 +404,8 @@ class Verb(Vocab):
             logging.warning(f"Cannot yet conjugate {self.conjugation}-th conjugation verbs: {self.description}")
     
     def load(self):
+        super().load()
+
         self.conjugation = self.determine_conjugation()
         self.conjugate()
 
@@ -433,7 +519,12 @@ class Noun(Declinable):
         self.base: str|None = None
         self.plural_only: bool = False
     
+    def get_extended_description(self):
+        return ", ".join(self.cases)
+    
     def load(self):
+        super().load()
+
         if self.nom_sg.endswith("a") and self.gen_sg.endswith("ae"):
             self.declension = 1
             self.base = self.gen_sg[:-2]

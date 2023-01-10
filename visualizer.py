@@ -11,10 +11,6 @@ from vocab import *
 class TextFilter:
     def __init__(self):
         self.table_row = None
-
-        self.text_input = None
-        self.word_match_combo = None
-        self.text_type_combo = None
     
     def __eq__(self, other: TextFilter):
         if not isinstance(other, TextFilter):
@@ -327,47 +323,6 @@ class Visualizer:
                             )
 
                             with dpg.group(horizontal=True, horizontal_spacing=0):
-
-                                # for s in vocab.description.split(PCol.CEND.value):
-                                #     theme = None
-                                #     font = None
-
-                                #     s = s.replace(PCol.CEND.value, "")
-
-                                #     i = 0
-                                #     if (i := s.find(PCol.CVIOLET.value)) != -1:
-                                #         s = s.replace(PCol.CVIOLET.value, "")
-                                #         theme = "vocab_theme"
-
-                                #     elif (i := s.find(PCol.CRED.value)) != -1:
-                                #         s = s.replace(PCol.CRED.value, "")
-                                #         theme = "latin_theme"
-                                #         font = self.bold_font
-
-                                #     elif (i := s.find(PCol.CBLUE.value)) != -1:
-                                #         s = s.replace(PCol.CBLUE.value, "")
-                                #         theme = "definition_theme"
-                                #         font = self.italic_font
-
-                                #     elif (i := s.find(PCol.CYELLOW.value)) != -1:
-                                #         s = s.replace(PCol.CYELLOW.value, "")
-                                #         theme = "gender_theme"
-
-                                #     elif (i := s.find(PCol.CGREY.value)) != -1:
-                                #         s = s.replace(PCol.CGREY.value, "")
-                                #         theme = "debug_info_theme"
-                                #         if i != 0:
-                                #             dpg.add_button(label=s[:i], callback=cb, user_data=cb_dat)
-                                #         continue
-
-                                #     if i != 0:
-                                #         text = dpg.add_button(label=s[:i], callback=cb, user_data=cb_dat)
-                                #         s = s[i:]
-
-                                #     text = dpg.add_button(label=s, callback=cb, user_data=cb_dat)
-                                #     if theme is not None: dpg.bind_item_theme(text, theme)
-                                #     if font is not None: dpg.bind_item_font(text, font)
-
                                 for desc, desc_type in vocab.get_parsed_description():
                                     theme = None
                                     font = None

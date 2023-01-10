@@ -3,9 +3,9 @@ from __future__ import annotations
 from html.parser import HTMLParser
 from typing import TypeAlias
 import string
+import logging
 
 import vocab
-import logging
 
 
 class PCol:
@@ -282,7 +282,7 @@ class HTMLReader:
 
         self.vocab_container: HTMLTag|None = None
 
-    def read_html(self):
+    def read_html(self) -> dict[str,list[vocab.Vocab]]:
         resulting_vocab = {}
 
         self.vocab_container = self.parsed_html.find("h1").parent
@@ -600,7 +600,11 @@ class VocabReader:
         return self.vocab
 
 
-def main():
+def get_parsed_vocab() -> dict[str,list[vocab.Vocab]]:
+    """
+    For quickstarting projects; gives a list of latin vocab 
+    """
+
     parsed_html: HTMLTag|None = None
 
     with open("LatinDictionary.html", 'r') as f:
@@ -610,7 +614,11 @@ def main():
         parsed_html = parser.root
     
     html_reader = HTMLReader(parsed_html)
-    parsed_vocab = html_reader.read_html()
+    return html_reader.read_html()
+
+
+def main():
+    parsed_vocab = get_parsed_vocab()
 
     import visualizer
     vis = visualizer.Visualizer()
